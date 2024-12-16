@@ -1,0 +1,146 @@
+body {
+    font-family: Arial, sans-serif;
+    direction: rtl;
+    text-align: right;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* لمحاذاة المحتوى في منتصف الصفحة */
+    align-items: center; /* لمحاذاة المحتوى عموديًا */
+    min-height: 100vh; /* لضمان أن الصفحة تمتد عبر كامل الشاشة */
+    background-color: #f4f4f4; /* لون خلفية ناعم */
+}
+
+h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+input {
+    padding: 8px;
+    margin: 10px 0;
+    width: 250px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background-color: #306EFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #255CCF;
+}
+
+#appContent {
+    margin: 20px;
+}
+
+.top-bar {
+    background-color: #306EFF;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.search-container {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.search-input {
+    width: 90%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #306EFF;
+    border-radius: 5px;
+}
+
+#motorsTable th, #motorsTable td {
+    padding: 12px;
+    text-align: right;
+    border: 1px solid #ddd;
+}
+
+#motorsTable td {
+    width: 150px;
+}
+
+#motorsTable {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+#motorsTable th {
+    background-color: #306EFF;
+    color: white;
+}
+
+#motorsTable td {
+    text-align: center;
+}
+
+/* نموذج إضافة موتور جديد */
+#motorForm {
+    padding: 20px;
+    background-color: #f9f9f9;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+}
+
+#motorForm label {
+    display: block;
+    margin: 10px 0 5px;
+}
+
+#motorForm input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#motorForm button {
+    background-color: #306EFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+#motorForm button:hover {
+    background-color: #255CCF;
+}
+
+#identifierErrorMessage, #phoneErrorMessage, #resetPasswordMessage {
+    margin-top: 5px;
+    font-size: 12px;
+    color: red;
+}
+
+#errorMessage {
+    color: red;
+    font-size: 14px;
+    display: block; /* تأكد من أن الرسالة تظهر */
+}
+
+#loginForm, #registerForm {
+    width: 100%;
+    max-width: 400px; /* تحديد أقصى عرض للنموذج */
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* تأثير الظل للنموذج */
+    text-align: center;
+}

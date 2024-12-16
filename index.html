@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق الموتورات</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
+</head>
+<body>
+
+<div id="loginForm">
+    <h2>تسجيل الدخول</h2>
+    <label for="email">البريد الإلكتروني:</label>
+    <input type="email" id="email" placeholder="البريد الإلكتروني">
+    <p id="emailErrorE" style="color: red;"></p>
+    <p id="emailErrorEr" style="color: red; display: none;"></p>
+
+    <label for="password">كلمة المرور:</label>
+    <input type="password" id="password" placeholder="كلمة المرور">
+    <p id="passwordErrorP" style="color: red;"></p>
+    <p id="passwordErrorEr" style="color: red; display: none;"></p>
+
+    <p id="errorLogin" style="color: red; display: none;"></p>
+    <button id="loginBtn">تسجيل الدخول</button>
+    <button id="registerRedirectBtn">إنشاء حساب جديد</button>
+</div>
+
+
+<div id="registerForm" style="display: none;">
+    <h2>إنشاء حساب جديد</h2>
+	<label for="registeridentifier">البريد الإلكتروني أو رقم الهاتف:</label>
+	<input type="text" id="identifier" placeholder="أدخل البريد الإلكتروني أو رقم الهاتف">
+	
+	<div id="emailMessage" style="display:none;color:red;"></div>
+    <div id="phoneMessage" style="display:none;color:red;"></div>
+    <div id="emailError" style="display:none;color:red;"></div>
+        <span id="resetPasswordMessage" style="color: red; display: none;"></span>
+
+    <p id="identifierError" style="color: red;"></p> <!-- التأكد من أن هذا العنصر موجود -->
+    <p id="resetPassword" style="color: blue; display: none;">هل نسيت كلمة المرور؟ <a href="reset-password.html">إعادة تعيين كلمة السر</a></p>
+    <br>
+
+    <label for="registerPassword">كلمة المرور:</label>
+	        <h5>يجب انت تكون كلمة السر مكونه من 6 احرف على الأقل أو 6 ارقام او خليط بين الحروف والارقام </h5>
+    <input type="password" id="registerPassword" placeholder="كلمة المرور">
+	<p id="passwordError" style="color: red;"></p>
+    <p id="passwordMessage" style="color: red;"></p>
+		
+
+    <label for="registerFullName">اسمك بالكامل:</label>
+    <input type="text" id="registerFullName" placeholder="الاسم الكامل">
+    <p id="FullNameError" style="color: red;"></p> <!-- رسالة خطأ الهاتف -->
+
+
+    <p id="duplicateMessage" style="color: red;"></p>
+    <button id="registerBtn">إنشاء حساب</button>
+    <p id="errorRegister" style="color: red; display: none;"></p>
+    <button id="loginRedirectBtn">عودة لتسجيل الدخول</button>
+</div>
+
+<!-- رسالة تحميل -->
+<div id="loadingIndicator" style="display: none; text-align: center;">
+    <p>جارٍ إنشاء الحساب...</p>
+    <img src="loading.gif" alt="جاري التحميل" style="width: 50px; height: 50px;">
+</div>
+
+<!-- رسالة الترحيب بعد التسجيل -->
+<div id="welcomeMessage" style="display: none; text-align: center;">
+    <h3>تم إنشاء الحساب بنجاح!</h3>
+    <p>مرحبًا بك، تم تسجيلك بنجاح.</p>
+    <button id="goToAppBtn" style="padding: 10px 20px; font-size: 16px;">الانتقال إلى التطبيق</button>
+</div>
+
+
+<div id="appContent" style="display: none;">
+    <div class="top-bar">
+        <h3>تطبيق الموتورات</h3>
+    </div>
+
+    <div id="adminActions" style="display: none; text-align: center; margin-top: 20px;">
+        <button id="showMotorForm">إضافة موتور</button>
+    </div>
+
+    <div id="searchContainer" class="search-container">
+        <label for="searchMotor">ابحث عن موتور:</label>
+        <input type="text" id="searchMotor" class="search-input" placeholder="ابحث عن موتور">
+    </div>
+
+    <div id="motorTableContainer">
+        <table id="motorsTable">
+            <thead>
+            <tr>
+                <th>موديل</th>
+                <th>HP</th>
+                <th>W</th>
+                <th>RLA-الامبير</th>
+                <th>الإزاحة-Displ</th>
+                <th>k CAL/HR</th>
+                <th>BTU</th>
+                <th>W -23</th>
+                <th>W -5</th>
+                <th>W -72</th>
+                <th>التطبيق</th>
+                <th>الفريون</th>
+                <th>الشركة المصنعة</th>
+                <th>الكهرباء</th>
+                <th>مكثف التشغيل</th>
+                <th>مكثف التقويم</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div id="noDataMessage" style="display:none; text-align: center; color: red; font-weight: bold; font-size: 24px;">
+        لا توجد له بيانات حتى الان
+    </div>
+
+    <div id="motorForm" style="display: none;">
+        <h2>إضافة موتور جديد</h2>
+        <label for="motorModel">موديل:</label>
+        <input id="motorModel" placeholder="موديل">
+
+        <label for="motorHP">HP:</label>
+        <input id="motorHP" placeholder="HP">
+
+        <label for="motorW">W:</label>
+        <input id="motorW" placeholder="W">
+
+        <label for="motorRLA">RLA-الامبير:</label>
+        <input id="motorRLA" placeholder="RLA-الامبير">
+
+        <label for="motorDisplCC">الإزاحة-Displ:</label>
+        <input id="motorDisplCC" placeholder="الإزاحة-Displ">
+
+        <label for="motorKCAL">k CAL/HR:</label>
+        <input id="motorKCAL" placeholder="k CAL/HR">
+
+        <label for="motorBTU">BTU:</label>
+        <input id="motorBTU" placeholder="BTU">
+
+        <label for="motorW23">W -23:</label>
+        <input id="motorW23" placeholder="W -23">
+
+        <label for="motorW5">W -5:</label>
+        <input id="motorW5" placeholder="W -5">
+
+        <label for="motorW72">W -72:</label>
+        <input id="motorW72" placeholder="W -72">
+
+        <label for="motorApplication">التطبيق:</label>
+        <input id="motorApplication" placeholder="التطبيق">
+
+        <label for="motorRefrigerant">الفريون:</label>
+        <input id="motorRefrigerant" placeholder="الفريون">
+
+        <label for="motorManufacturer">الشركة المصنعة:</label>
+        <input id="motorManufacturer" placeholder="الشركة المصنعة">
+
+        <label for="motorElectricity">الكهرباء:</label>
+        <input id="motorElectricity" placeholder="الكهرباء">
+
+        <label for="motorRunningCapacitor">مكثف التشغيل:</label>
+        <input id="motorRunningCapacitor" placeholder="مكثف التشغيل">
+
+        <label for="motorStartingCapacitor">مكثف التقويم:</label>
+        <input id="motorStartingCapacitor" placeholder="مكثف التقويم">
+
+        <button id="saveMotorBtn">حفظ</button>
+        <button id="cancelMotorBtn">إلغاء</button>
+    </div>
+
+    <div id="uploadSection">
+        <h2>رفع ملف بيانات المواتير</h2>
+        <label for="fileInput">اختيار ملف:</label>
+        <input type="file" id="fileInput" accept=".xls,.xlsx" />
+        <button id="uploadBtn">رفع البيانات</button>
+    </div>
+</div>
+
+<script type="module" src="scripts.js"></script>
+</body>
+</html>
