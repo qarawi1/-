@@ -135,12 +135,21 @@ button:hover {
     display: block; /* تأكد من أن الرسالة تظهر */
 }
 
+/* حاوية تسجيل الدخول والتسجيل */
+#authContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4; /* لون خفيف للخلفية */
+}
+
 #loginForm, #registerForm {
     width: 100%;
-    max-width: 400px; /* تحديد أقصى عرض للنموذج */
+    max-width: 400px;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* تأثير الظل للنموذج */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
