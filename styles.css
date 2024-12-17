@@ -1,22 +1,44 @@
+/* تنسيق body ليكون متجاوباً */
 body {
     font-family: Arial, sans-serif;
-    direction: rtl;
+    direction: rtl; /* الحفاظ على اتجاه الكتابة من اليمين لليسار */
     text-align: right;
     margin: 0;
     padding: 0;
+    display: flex;
+    justify-content: center; /* محاذاة المحتوى في منتصف الصفحة */
+    align-items: flex-start; /* محاذاة المحتوى من الأعلى */
+    min-height: 100vh;
+    background-color: #f4f4f4;
+    flex-direction: column; /* وضع العناصر في عمود */
+}
+
+
+
+
+#loginForm, #registerForm {
+    width: 100%;
+    max-width: 400px; /* تحديد أقصى عرض للنموذج */
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* تأثير الظل للنموذج */
+    text-align: center;
 }
 
 h2 {
     font-size: 20px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 input {
     padding: 8px;
     margin: 10px 0;
-    width: 250px;
+    width: 100%; /* تأكد من أن المدخلات تأخذ عرض النموذج */
+    max-width: 250px; /* أقصى عرض للحقل */
     border-radius: 4px;
     border: 1px solid #ccc;
+    box-sizing: border-box; /* تأكد من أن padding لا يخرج عن حدود العنصر */
 }
 
 button {
@@ -27,23 +49,41 @@ button {
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
+    width: 100%;
+    margin: 10px 0; /* مسافة بين الأزرار بشكل عمودي */
 }
+
 
 button:hover {
     background-color: #255CCF;
 }
 
-#appContent {
-    margin: 20px;
+#errorMessage, #loginError, #registerError {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+    display: none; /* الرسائل تظهر فقط عند وجود خطأ */
 }
 
+
+#appContent {
+    margin-top: 60px; /* إضافة هامش ليكون المحتوى أسفل الشريط العلوي */
+    padding: 20px;
+    width: 100%;
+    max-width: 1200px; /* تحديد الحد الأقصى للعرض */
+    box-sizing: border-box; /* التأكد من أن المحتوى لا يتجاوز الحدود */
+}
+
+/* شريط العنوان العلوي */
 .top-bar {
     background-color: #306EFF;
     color: white;
     padding: 10px;
     text-align: center;
     font-size: 20px;
+
 }
+
 
 .search-container {
     margin: 20px 0;
@@ -127,15 +167,20 @@ button:hover {
 #errorMessage {
     color: red;
     font-size: 14px;
-    display: block; /* تأكد من أن الرسالة تظهر */
+    display: block;
 }
 
-#loginForm, #registerForm {
-    width: 100%;
-    max-width: 400px; /* تحديد أقصى عرض للنموذج */
-    padding: 20px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* تأثير الظل للنموذج */
-    text-align: center;
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    #loginForm, #registerForm {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    input {
+        max-width: 100%;
+    }
 }
