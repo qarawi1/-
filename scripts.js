@@ -15,223 +15,69 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const firestore = getFirestore(app);
 
-async function checkAdmin(userId) {
-    const userDocRef = doc(firestore, "users", userId);
-    const userDocSnap = await getDoc(userDocRef);
 
-    if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
-        document.getElementById('adminActions').style.display = userData.isAdmin ? 'block' : 'none';
+
+// التحقق إذا كان المستخدم قد سجل الدخول عند تحميل الصفحةwindow.onload = function() {
+window.onload = function() {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+        // إذا لم يكن هناك مستخدم، إعادة توجيه إلى صفحة تسجيل الدخول
+        window.location.href = 'auth.html';
     } else {
-        console.log("لا يوجد بيانات لهذا المستخدم");
-        document.getElementById('adminActions').style.display = 'none';
+        // إذا كان هناك مستخدم مسجل، عرض محتوى التطبيق
+        document.getElementById('appContent').style.display = 'block';
+        
+    }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const user = JSON.parse(localStorage.getItem("user")); // الحصول على بيانات المستخدم من Local Storage
+    if (user && user.uid) {
+        await checkAdmin(user.uid); // التحقق مما إذا كان المستخدم أدمن
+    } else {
+        console.log("لم يتم العثور على مستخدم مسجل الدخول.");
+    }
+});
+
+async function checkAdmin(userId) {
+    try {
+        const userDocRef = doc(firestore, "users", userId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            console.log("بيانات المستخدم:", userData);
+
+            // إظهار الزر إذا كان المستخدم أدمن
+            document.getElementById("adminActions").style.display = userData.isAdmin ? "block" : "none";
+        } else {
+            console.log("لا يوجد بيانات لهذا المستخدم");
+            document.getElementById("adminActions").style.display = "none";
+        }
+    } catch (error) {
+        console.error("خطأ أثناء جلب بيانات المستخدم:", error);
     }
 }
 
 
-document.getElementById('loginBtn').addEventListener('click', () => {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
+// إضافة وظيفة لتسجيل الخروج عند النقر على الزر
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    // مسح بيانات المستخدم من localStorage
+    localStorage.removeItem('user');
 
-    // مسح رسائل الخطأ السابقة
-    document.getElementById('emailErrorE').textContent = '';
-    document.getElementById('emailErrorEr').style.display = 'none';
-    document.getElementById('passwordErrorP').textContent = '';
-    document.getElementById('passwordErrorEr').style.display = 'none';
-    document.getElementById('errorLogin').style.display = 'none';
-
-    // التحقق من وجود البريد وكلمة المرور
-    if (!email || !password) {
-        if (!email) {
-            document.getElementById('emailErrorE').textContent = 'يرجى إدخال البريد الإلكتروني.';
-        }
-        if (!password) {
-            document.getElementById('passwordErrorP').textContent = 'يرجى إدخال كلمة المرور.';
-        }
-        return;
-    }
-
-    // تسجيل الدخول باستخدام Firebase
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            // إخفاء نموذج تسجيل الدخول وعرض محتوى التطبيق
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('appContent').style.display = 'block';
-
-            checkAdmin(userCredential.user.uid);
-        })
-        .catch((error) => {
-console.error('Full error object:', error);
-
-    // إخفاء رسائل الخطأ القديمة
-    document.getElementById('emailErrorEr').style.display = 'none';
-    document.getElementById('passwordErrorEr').style.display = 'none';
-    document.getElementById('errorLogin').style.display = 'none';
-
-    // التعامل مع أكواد الخطأ
-            switch (error.code) {
-                case 'auth/user-not-found':
-                    document.getElementById('emailErrorEr').textContent = 'البريد الإلكتروني غير مسجل.';
-                    document.getElementById('emailErrorEr').style.display = 'block';
-                    break;
-                case 'auth/wrong-password':
-                    document.getElementById('passwordErrorEr').textContent = 'كلمة المرور غير صحيحة.';
-                    document.getElementById('passwordErrorEr').style.display = 'block';
-                    break;
-                case 'auth/invalid-email':
-                    document.getElementById('emailErrorEr').textContent = 'تنسيق البريد الإلكتروني غير صحيح.';
-                    document.getElementById('emailErrorEr').style.display = 'block';
-                    break;
-                case 'auth/too-many-requests':
-                    document.getElementById('errorLogin').textContent = 'تم حظر الحساب مؤقتًا بسبب محاولات متكررة. حاول لاحقًا.';
-                    document.getElementById('errorLogin').style.display = 'block';
-                    break;
-                case 'auth/invalid-login-credentials': // معالجة خطأ غير شائع
-                    document.getElementById('errorLogin').textContent = 'بيانات تسجيل الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور.';
-                    document.getElementById('errorLogin').style.display = 'block';
-                    break;
-                default:
-                    // عرض رسالة خطأ عامة
-                    document.getElementById('errorLogin').textContent = 'فشل تسجيل الدخول: ' + error.message;
-                    document.getElementById('errorLogin').style.display = 'block';
-                    break;
-            }
-        });
+    // إعادة توجيه المستخدم إلى صفحة تسجيل الدخول
+    window.location.href = 'auth.html'; // أو الصفحة التي تستخدمها لتسجيل الدخول
 });
-
-
-
-// دالة لتسجيل مستخدم جديد
-document.getElementById("registerBtn").addEventListener("click", async (event) => {
-    event.preventDefault();
-
-    // الحصول على القيم من المدخلات
-    const identifier = document.getElementById("identifier").value.trim();
-    const password = document.getElementById("registerPassword").value.trim();
-    const fullName = document.getElementById("registerFullName").value.trim();
-
-    // مسح رسائل الأخطاء السابقة
-    document.getElementById("identifierError").textContent = "";
-    document.getElementById("passwordError").textContent = "";
-    document.getElementById("resetPasswordMessage").textContent = ""; // إخفاء رسالة إعادة تعيين كلمة المرور
-
-    // التحقق من المدخلات
-    if (!identifier || !password || !fullName) {
-        if (!identifier) document.getElementById("identifierError").innerText = "يرجى إدخال البريد الإلكتروني أو رقم الهاتف.";
-        if (!password) document.getElementById("passwordError").innerText = "يرجى إدخال كلمة المرور.";
-        if (!fullName) document.getElementById("FullNameError").innerText = "يرجى إدخال الاسم بالكامل.";
-        return;
-    }
-
-    // التحقق من نوع المدخل (بريد إلكتروني أم رقم هاتف)
-    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
-    const isPhone = /^\+?\d{10,15}$/.test(identifier);
-
-    if (!isEmail && !isPhone) {
-        document.getElementById("identifierError").innerText = "يرجى إدخال بريد إلكتروني صحيح أو رقم هاتف صالح.";
-        return;
-    }
-
-   try {
-        // عرض علامة تحميل
-        document.getElementById("loadingIndicator").style.display = "block";
-
-        // إنشاء المستخدم
-        let userCredential;
-        if (isEmail) {
-            userCredential = await createUserWithEmailAndPassword(auth, identifier, password);
-        } else {
-            const fakeEmail = `${identifier}@phone.fake`; // إنشاء بريد مزيف للأرقام
-            userCredential = await createUserWithEmailAndPassword(auth, fakeEmail, password);
-        }
-
-        const user = userCredential.user;
-
-        // تخزين بيانات المستخدم في Firestore
-        await setDoc(doc(firestore, "users", user.uid), {
-            fullName,
-            phone: isPhone ? identifier : null,
-            email: isEmail ? identifier : null,
-            isAdmin: false,
-        });
-
- // إخفاء علامة التحميل
-        document.getElementById("loadingIndicator").style.display = "none";
-
-        // عرض رسالة الترحيب وزر الانتقال
-        document.getElementById("registerForm").style.display = "none";
-        document.getElementById("welcomeMessage").style.display = "block";
-
-    
-    } catch (error) {
-		        // إخفاء علامة التحميل في حالة وجود خطأ
-		        document.getElementById("loadingIndicator").style.display = "none";
-
-        if (error.code === "auth/email-already-in-use") {
-            // عرض رسالة الخطأ
-            document.getElementById("identifierError").textContent = "البريد الإلكتروني أو رقم الهاتف مسجل بالفعل.";
-
-            // إنشاء رسالة إضافية لإعادة تعيين كلمة المرور
-            const resetPasswordMessage = document.getElementById("resetPasswordMessage");
-            resetPasswordMessage.innerHTML = `
-                هل تريد <span id="resetPasswordLink" style="color: blue; text-decoration: underline; cursor: pointer;">إعادة تعيين كلمة السر</span>؟
-            `;
-            resetPasswordMessage.style.display = "block";
-
-            // إضافة حدث عند الضغط على رابط إعادة تعيين كلمة المرور
-            document.getElementById("resetPasswordLink").addEventListener("click", async () => {
-                if (isEmail) {
-                    try {
-                        await sendPasswordResetEmail(auth, identifier);
-                        alert("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.");
-                    } catch (resetError) {
-                        alert("حدث خطأ أثناء إرسال رابط إعادة تعيين كلمة المرور: " + resetError.message);
-                    }
-                } else {
-                    alert("لا يمكن إعادة تعيين كلمة المرور باستخدام رقم الهاتف.");
-                }
-            });
-        } else if (error.code === "auth/invalid-email") {
-            document.getElementById("identifierError").textContent = "البريد الإلكتروني غير صالح.";
-        } else if (error.code === "auth/weak-password") {
-            document.getElementById("passwordError").textContent = "كلمة المرور ضعيفة. يجب أن تكون على الأقل 6 أحرف.";
-        } else {
-            console.error("فشل التسجيل:", error);
-            alert("حدث خطأ أثناء التسجيل: " + error.message);
-        }
-    }
-});
-
-// التعامل مع زر الانتقال إلى التطبيق
-document.getElementById("goToAppBtn").addEventListener("click", () => {
-    document.getElementById("welcomeMessage").style.display = "none";
-    document.getElementById("appContent").style.display = "block";
-});
-
-
-
-
 
 // إضافة الأقواس المفقودة في أماكن أخرى من الكود، مثل الدوال الأخرى.
 
 
-function showLoginForm() {
-    document.getElementById('loginForm').style.display = 'block';
-    document.getElementById('registerForm').style.display = 'none';
-}
-
-function showRegisterForm() {
-    document.getElementById('registerForm').style.display = 'block';
-    document.getElementById('loginForm').style.display = 'none';
-}
-
-document.getElementById('registerRedirectBtn').addEventListener('click', showRegisterForm);
-document.getElementById('loginRedirectBtn').addEventListener('click', showLoginForm);
 
 async function searchMotor() {
     const searchQuery = document.getElementById("searchMotor").value.toLowerCase();
     const tableBody = document.getElementById("motorsTable").getElementsByTagName("tbody")[0];
+	    const noDataMessage = document.getElementById("noDataMessage"); // إضافة مرجع للرسالة
     tableBody.innerHTML = ""; // تفريغ الجدول
 
     try {
@@ -248,7 +94,10 @@ async function searchMotor() {
 
         if (filteredMotors.length === 0) {
             tableBody.innerHTML = "<tr><td colspan='16'>لا توجد نتائج مطابقة</td></tr>";
+						 noDataMessage.style.display = 'block'; // إظهار الرسالة
         } else {
+            // إخفاء الرسالة إذا كانت هناك نتائج
+            noDataMessage.style.display = 'none'; 
             // ترتيب الحقول الذي يجب عرضه
             const fieldOrder = [
                 "model",
@@ -328,7 +177,6 @@ document.getElementById("cancelMotorBtn").addEventListener("click", () => {
             section.style.display = 'block'; // إعادة عرض الأقسام الأخرى
         }
     });
-    searchMotor(); // تحديث جدول الموتورات بعد الإلغاء
 });
 
 document.getElementById('showMotorForm').addEventListener('click', showMotorForm);
@@ -380,13 +228,12 @@ document.getElementById("saveMotorBtn").addEventListener("click", async () => {
         document.getElementById("motorRunningCapacitor").value = "";
         document.getElementById("motorStartingCapacitor").value = "";
 
-        searchMotor(); // تحديث جدول الموتورات بعد الإضافة
 
     } catch (error) {
         console.log("حدث خطأ أثناء الحفظ:", error.message);
         alert("حدث خطأ أثناء الحفظ: " + error.message);
     }
-});
+	    });
 
 
 document.getElementById("uploadBtn").addEventListener("click", async () => {

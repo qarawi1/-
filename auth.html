@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول وإنشاء حساب</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+
+</head>
+<body>
+
+
+<div id="authContainer">
+<div id="loginForm">
+    <h2>تسجيل الدخول</h2>
+    <label for="email">البريد الإلكتروني:</label>
+    <input type="email" id="email" placeholder="البريد الإلكتروني">
+    <p id="emailErrorE" style="color: red;"></p>
+    <p id="emailErrorEr" style="color: red; display: none;"></p>
+
+    <label for="password">كلمة المرور:</label>
+    <input type="password" id="password" placeholder="كلمة المرور">
+    <p id="passwordErrorP" style="color: red;"></p>
+    <p id="passwordErrorEr" style="color: red; display: none;"></p>
+
+    <p id="errorLogin" style="color: red; display: none;"></p>
+    <button id="loginBtn">تسجيل الدخول</button>
+    <button id="registerRedirectBtn">إنشاء حساب جديد</button>
+</div>
+
+<div id="registerForm" style="display: none;">
+    <h2>إنشاء حساب جديد</h2>
+	<label for="registeridentifier">البريد الإلكتروني أو رقم الهاتف:</label>
+	<input type="text" id="identifier" placeholder="أدخل البريد الإلكتروني أو رقم الهاتف">
+	
+	<div id="emailMessage" style="display:none;color:red;"></div>
+    <div id="phoneMessage" style="display:none;color:red;"></div>
+    <div id="emailError" style="display:none;color:red;"></div>
+        <span id="resetPasswordMessage" style="color: red; display: none;"></span>
+
+    <p id="identifierError" style="color: red;"></p> <!-- التأكد من أن هذا العنصر موجود -->
+    <p id="resetPassword" style="color: blue; display: none;">هل نسيت كلمة المرور؟ <a href="reset-password.html">إعادة تعيين كلمة السر</a></p>
+    <br>
+
+    <label for="registerPassword">كلمة المرور:</label>
+	        <h5>يجب انت تكون كلمة السر مكونه من 6 احرف على الأقل أو 6 ارقام او خليط بين الحروف والارقام </h5>
+    <input type="password" id="registerPassword" placeholder="كلمة المرور">
+	<p id="passwordError" style="color: red;"></p>
+    <p id="passwordMessage" style="color: red;"></p>
+		
+
+    <label for="registerFullName">اسمك بالكامل:</label>
+    <input type="text" id="registerFullName" placeholder="الاسم الكامل">
+    <p id="FullNameError" style="color: red;"></p> <!-- رسالة خطأ الهاتف -->
+
+
+    <p id="duplicateMessage" style="color: red;"></p>
+    <button id="registerBtn">إنشاء حساب</button>
+    <p id="errorRegister" style="color: red; display: none;"></p>
+    <button id="loginRedirectBtn">عودة لتسجيل الدخول</button>
+</div>
+
+<!-- رسالة تحميل -->
+<div id="loadingIndicator" style="display: none; text-align: center;">
+    <p>جارٍ إنشاء الحساب...</p>
+    <img src="loading.gif" alt="جاري التحميل" style="width: 50px; height: 50px;">
+</div>
+
+<!-- رسالة الترحيب بعد التسجيل -->
+<div id="welcomeMessage" style="display: none; text-align: center;">
+    <h3>تم إنشاء الحساب بنجاح!</h3>
+    <p>مرحبًا بك، تم تسجيلك بنجاح.</p>
+    <button id="goToAppBtn" style="padding: 10px 20px; font-size: 16px;">الانتقال إلى التطبيق</button>
+</div>
+
+    <script type="module" src="auth.js"></script>
+
+</body>
+</html>
