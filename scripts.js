@@ -75,6 +75,10 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
 
 
 async function searchMotor() {
+	function showLoading() {
+    document.getElementById("loading").style.display = "block"; // تُظهر الصورة
+}
+
     const searchQuery = document.getElementById("searchMotor").value.toLowerCase();
     const tableBody = document.getElementById("motorsTable").getElementsByTagName("tbody")[0];
 	    const noDataMessage = document.getElementById("noDataMessage"); // إضافة مرجع للرسالة
@@ -138,7 +142,10 @@ async function searchMotor() {
     } catch (error) {
         console.error("حدث خطأ أثناء البحث:", error);
         alert("فشل البحث، يرجى المحاولة لاحقًا.");
-    }
+    }function hideLoading() {
+    document.getElementById("loading").style.display = "none"; // تُخفي الصورة
+}
+
 }
 
 

@@ -1,0 +1,132 @@
+body {
+    font-family: Arial, sans-serif;
+    direction: rtl;
+    text-align: right;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    background-color: #f9f9f9; /* لون خلفية عام */
+    display: flex;
+    justify-content: center; /* محاذاة أفقية للمحتوى */
+    align-items: center; /* محاذاة عمودية للمحتوى */
+    min-height: 100vh; /* ملء الشاشة */
+}
+
+/* حاوية تسجيل الدخول والتسجيل */
+#loginForm, #registerForm {
+    width: 100%;
+    max-width: 360px; /* عرض مناسب */
+    padding: 20px; /* مساحة داخلية */
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* تأثير الظل */
+    text-align: center;
+    margin: 20px 0; /* مسافة من الأعلى والأسفل */
+}
+
+/* تنسيق الحقول داخل النموذج */
+#loginForm input, #registerForm input {
+    width: 100%; /* الحقول تأخذ العرض الكامل */
+    padding: 10px; /* مساحة داخلية */
+    margin-bottom: 15px; /* مسافة بين الحقول */
+    border: 1px solid #ccc; /* إطار بسيط */
+    border-radius: 5px; /* زوايا مستديرة */
+    box-sizing: border-box; /* تضمين الحشوة ضمن العرض */
+    font-size: 14px; /* حجم النص داخل الحقول */
+}
+
+/* تنسيق تسميات الحقول */
+#loginForm label, #registerForm label {
+    display: block; /* كل تسمية تأخذ خط مستقل */
+    margin-bottom: 8px; /* مسافة بين التسمية والحقل */
+    font-weight: bold; /* خط عريض */
+    text-align: right; /* المحاذاة إلى اليمين */
+    font-size: 14px;
+    color: #333;
+}
+
+/* زر تسجيل الدخول/التسجيل */
+#loginForm button, #registerForm button {
+    width: 100%; /* عرض الزر بالكامل */
+    padding: 10px; /* مساحة داخلية */
+    background-color: #306EFF; /* لون الزر */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px; /* حجم النص داخل الزر */
+    cursor: pointer;
+}
+
+#loginForm button:hover, #registerForm button:hover {
+    background-color: #255CCF; /* لون عند التمرير */
+}
+
+/* رسائل الخطأ */
+#errorMessage {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 15px; /* مسافة بين الرسالة والحقول */
+    display: block;
+}
+
+/* الأيقونات الاجتماعية */
+.social-icons {
+    margin-top: 5px;
+}
+
+.social-icons a {
+    margin: 0 10px;
+    display: inline-block;
+}
+
+.icon {
+    width: 24px; /* حجم الأيقونات */
+    height: auto;
+    vertical-align: middle;
+}
+
+.app-icon {
+    width: 100px;
+    height: auto;
+    margin: 0 auto 20px;
+    display: block;
+}
+
+/* شريط الفوتر */
+/* شريط الفوتر */
+.footer {
+    background-color: #f4f4f4; /* لون خلفية فاتح */
+    text-align: center;
+    padding: 15px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    display: flex; /* استخدام flexbox لتوسيط المحتوى */
+    justify-content: center; /* محاذاة المحتوى أفقياً في المنتصف */
+    align-items: center; /* محاذاة المحتوى عمودياً في المنتصف */
+}
+
+
+/* تحسين تنسيق الرابط (علاء القراوي) */
+#footer a {
+    color: #306EFF;
+    text-decoration: none; /* إزالة الخط السفلي */
+}
+
+#footer a:hover {
+    text-decoration: underline; /* إظهار الخط عند التمرير */
+}
+
+/* شاشة التحميل */
+#loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.8); /* خلفية شفافة */
+    padding: 20px;
+    border-radius: 10px;
+}

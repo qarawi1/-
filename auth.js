@@ -221,3 +221,11 @@ document.getElementById("goToAppBtn").addEventListener("click", () => {
     document.getElementById("welcomeMessage").style.display = "none";
     window.location.href = 'index.html'; // أو الصفحة التي تستخدمها لتسجيل الدخول
 });
+
+function showLoading() {
+    document.getElementById("loading").style.display = "block";
+}
+
+function hideLoading() {
+    document.getElementById("loading").style.display = "none";
+}
