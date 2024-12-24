@@ -10,6 +10,7 @@ body {
     justify-content: center; /* محاذاة أفقية للمحتوى */
     align-items: center; /* محاذاة عمودية للمحتوى */
     min-height: 100vh; /* ملء الشاشة */
+    box-sizing: border-box; /* لضمان حساب الحشوة بشكل صحيح */
 }
 
 /* حاوية تسجيل الدخول والتسجيل */
@@ -22,6 +23,7 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* تأثير الظل */
     text-align: center;
     margin: 20px 0; /* مسافة من الأعلى والأسفل */
+    box-sizing: border-box; /* تضمين الحشوة ضمن الحساب */
 }
 
 /* تنسيق الحقول داخل النموذج */
@@ -55,6 +57,7 @@ body {
     border-radius: 5px;
     font-size: 16px; /* حجم النص داخل الزر */
     cursor: pointer;
+    margin-bottom: 10px; /* مسافة بين الأزرار */
 }
 
 #loginForm button:hover, #registerForm button:hover {
@@ -92,24 +95,27 @@ body {
     display: block;
 }
 
-/* شريط الفوتر */
-/* شريط الفوتر */
+
+/* الفوتر */
 .footer {
-    background-color: #f4f4f4; /* لون خلفية فاتح */
+    background-color: #f4f4f4;
     text-align: center;
-    padding: 15px 0;
+    padding: 4px 0;
     position: fixed;
     bottom: 0;
+    left: 0;
+    right: 0;
     width: 100%;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
     font-size: 14px;
-    display: flex; /* استخدام flexbox لتوسيط المحتوى */
-    justify-content: center; /* محاذاة المحتوى أفقياً في المنتصف */
-    align-items: center; /* محاذاة المحتوى عمودياً في المنتصف */
+    display: flex;
+    justify-content: center; /* توسيط النص أفقياً */
+    align-items: center; /* توسيط النص عمودياً */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 
-/* تحسين تنسيق الرابط (علاء القراوي) */
+/* تحسين تنسيق الرابط */
 #footer a {
     color: #306EFF;
     text-decoration: none; /* إزالة الخط السفلي */
@@ -129,4 +135,17 @@ body {
     background-color: rgba(255, 255, 255, 0.8); /* خلفية شفافة */
     padding: 20px;
     border-radius: 10px;
+}
+
+
+/* تحسين التنسيق لأحجام الشاشات المختلفة */
+@media (max-width: 768px) {
+    #loginForm, #registerForm {
+        padding: 15px;
+        max-width: 300px;
+    }
+
+    .footer {
+        font-size: 12px; /* تصغير الخط للفوتر */
+    }
 }

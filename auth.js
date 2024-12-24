@@ -35,50 +35,80 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('loginBtn');
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
-            const email = document.getElementById('email').value.trim();
+            const identifier = document.getElementById('email').value.trim(); // يمكن أن يكون بريدًا إلكترونيًا أو رقم هاتف
             const password = document.getElementById('password').value.trim();
-    // مسح رسائل الخطأ السابقة
+
+            // مسح رسائل الخطأ السابقة
+            clearErrorMessages();
+
+            // التحقق من وجود المدخلات
+            if (!identifier || !password) {
+                if (!identifier) {
+                    document.getElementById('emailErrorE').textContent = 'يرجى إدخال البريد الإلكتروني أو رقم الهاتف.';
+                }
+                if (!password) {
+                    document.getElementById('passwordErrorP').textContent = 'يرجى إدخال كلمة المرور.';
+                }
+                return;
+            }
+
+            // التحقق من نوع المدخل (بريد إلكتروني أو رقم هاتف)
+            const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+            const isPhone = /^\+?\d{10,15}$/.test(identifier);
+
+            if (!isEmail && !isPhone) {
+                document.getElementById('emailErrorEr').textContent = 'يرجى إدخال بريد إلكتروني صالح أو رقم هاتف صالح.';
+                document.getElementById('emailErrorEr').style.display = 'block';
+                return;
+            }
+
+            // تسجيل الدخول
+            if (isEmail) {
+                loginWithEmail(identifier, password);
+            } else if (isPhone) {
+                const fakeEmail = `${identifier}@phone.fake`; // تحويل رقم الهاتف إلى بريد إلكتروني وهمي
+                loginWithEmail(fakeEmail, password);
+            }
+        });
+    }
+});
+
+// وظيفة لمسح رسائل الخطأ السابقة
+function clearErrorMessages() {
     document.getElementById('emailErrorE').textContent = '';
     document.getElementById('emailErrorEr').style.display = 'none';
     document.getElementById('passwordErrorP').textContent = '';
     document.getElementById('passwordErrorEr').style.display = 'none';
     document.getElementById('errorLogin').style.display = 'none';
+}
 
-    // التحقق من وجود البريد وكلمة المرور
-    if (!email || !password) {
-        if (!email) {
-            document.getElementById('emailErrorE').textContent = 'يرجى إدخال البريد الإلكتروني.';
-        }
-        if (!password) {
-            document.getElementById('passwordErrorP').textContent = 'يرجى إدخال كلمة المرور.';
-        }
-        return;
-    }
-
-    // تسجيل الدخول باستخدام Firebase
+// وظيفة لتسجيل الدخول باستخدام البريد الإلكتروني وكلمة المرور
+function loginWithEmail(email, password) {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-			
-			  // تخزين بيانات المستخدم في الفاصلة
-        localStorage.setItem("user", JSON.stringify(userCredential.user));
-
-    
-	
-            // إخفاء نموذج تسجيل الدخول وعرض محتوى التطبيق
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'none';
-    // إعادة توجيه المستخدم إلى صفحة التطبيق
-        window.location.href = 'index.html'; // استبدل app.html باسم صفحة التطبيق الخاصة بك
-		
-            checkAdmin(userCredential.user.uid);
+            handleLoginSuccess(userCredential);
         })
         .catch((error) => {
-console.error('Full error object:', error);
+            handleLoginError(error);
+        });
+}
+
+// وظيفة لمعالجة نجاح تسجيل الدخول
+function handleLoginSuccess(userCredential) {
+    // تخزين بيانات المستخدم في localStorage
+    localStorage.setItem('user', JSON.stringify(userCredential.user));
+
+    // إعادة توجيه المستخدم إلى الصفحة الرئيسية
+    window.location.href = 'index.html'; // استبدل index.html بصفحة التطبيق الخاصة بك
+}
+
+// وظيفة لمعالجة أخطاء تسجيل الدخول
+function handleLoginError(error) {
+    console.error('Full error object:', error);
 
     // إخفاء رسائل الخطأ القديمة
-    document.getElementById('emailErrorEr').style.display = 'none';
-    document.getElementById('passwordErrorEr').style.display = 'none';
-    document.getElementById('errorLogin').style.display = 'none';
+    clearErrorMessages();
+
 
     // التعامل مع أكواد الخطأ
             switch (error.code) {
@@ -107,11 +137,8 @@ console.error('Full error object:', error);
                     document.getElementById('errorLogin').textContent = 'فشل تسجيل الدخول: ' + error.message;
                     document.getElementById('errorLogin').style.display = 'block';
                     break;
-            }
-                });
-        });
     }
-});
+}
 
 
 
@@ -168,6 +195,15 @@ document.getElementById("registerBtn").addEventListener("click", async (event) =
             email: isEmail ? identifier : null,
             isAdmin: false,
         });
+		
+		  // تخزين بيانات المستخدم في localStorage
+        localStorage.setItem("user", JSON.stringify({
+            uid: user.uid,
+            fullName: fullName,
+            phone: isPhone ? identifier : null,
+            email: isEmail ? identifier : null,
+        }));
+
 
  // إخفاء علامة التحميل
         document.getElementById("loadingIndicator").style.display = "none";
