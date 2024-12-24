@@ -1,11 +1,14 @@
-body {
+html, body {
+    height: 100%; /* تأكد أن الـ body و html يملآن الشاشة */
+    margin: 0;
+    padding: 0;
+    overflow: auto; /* السماح بالتمرير */
     font-family: Arial, sans-serif;
     direction: rtl;
     text-align: right;
-    margin: 0;
-    padding: 0;
-    font-size: 14px; /* تقليل حجم الخط الأساسي */
+    font-size: 14px;
 }
+
 
 h2 {
     font-size: 18px; /* تصغير حجم العنوان */
@@ -39,8 +42,8 @@ button:hover {
     display: flex;
     flex-direction: column;
     overflow-y: auto; /* السماح بالتمرير العمودي */
-    padding-top: 50px;
-    height: calc(100vh - 50px); /* يترك مساحة للشريط العلوي */
+    padding-top: 50px; /* تفادي الشريط العلوي */
+    min-height: 100%; /* تأكد من ملء الشاشة */
     box-sizing: border-box;
 }
 
@@ -48,10 +51,10 @@ button:hover {
 .top-bar {
     background-color: #306EFF;
     color: white;
-    padding: 5px 10px; /* تقليل الحشو */
+    padding: 5px 10px;
     text-align: center;
     font-size: 0px; /* تصغير حجم النص */
-    position: fixed; /* تثبيت الشريط العلوي */
+    position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
@@ -73,7 +76,7 @@ button:hover {
 
 #motorTableContainer {
     flex-grow: 1;
-    overflow-y: auto; /* تفعيل التمرير العمودي فقط على الجدول */
+    overflow-y: auto; /* تفعيل التمرير العمودي فقط للجدول */
     padding: 10px;
     margin-top: 15px;
 }
