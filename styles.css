@@ -38,11 +38,12 @@ button:hover {
 #appContent {
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* منع التمرير على الحاوية الأساسية */
-    padding-top: 50px; /* إضافة مسافة لتفادي الشريط العلوي */
-    height: 100vh; /* ملء الشاشة بالكامل */
+    overflow-y: auto; /* السماح بالتمرير العمودي */
+    padding-top: 50px;
+    height: calc(100vh - 50px); /* يترك مساحة للشريط العلوي */
     box-sizing: border-box;
 }
+
 
 .top-bar {
     background-color: #306EFF;
