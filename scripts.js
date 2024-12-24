@@ -342,3 +342,24 @@ function processMotorData(data) {
         starting_capacitor: data.starting_capacitor || ""
     };
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const dropdownToggle = document.getElementById('dropdownToggle');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+
+    // إظهار أو إخفاء القائمة عند النقر على الأيقونة
+    dropdownToggle.addEventListener('click', (e) => {
+        e.stopPropagation(); // منع إخفاء القائمة عند النقر على الأيقونة
+        dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // إخفاء القائمة عند النقر في أي مكان في الصفحة
+    document.addEventListener('click', () => {
+        dropdownMenu.style.display = 'none';
+    });
+
+    // منع إخفاء القائمة عند النقر عليها
+    dropdownMenu.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+});

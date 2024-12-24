@@ -48,17 +48,18 @@ button:hover {
 }
 
 
+/* تنسيق الشريط العلوي */
 .top-bar {
     background-color: #306EFF;
     color: white;
     padding: 5px 10px;
-    text-align: center;
-    font-size: 0px; /* تصغير حجم النص */
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .search-container {
@@ -152,3 +153,62 @@ button:hover {
     font-size: 18px; /* تقليل حجم النص */
     margin-top: 10px;
 }
+
+
+
+/* تنسيق القائمة المنسدلة */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    float: right;
+}
+
+.dropdown-toggle {
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: white;
+    padding: 5px 10px;
+}
+
+.dropdown-menu {
+    display: none; /* إخفاء القائمة افتراضيًا */
+    position: absolute;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: right;
+    min-width: 200px; /* عرض ثابت للقائمة */
+    max-width: 300px; /* عرض مرن عند الحاجة */
+    overflow-y: auto; /* التمرير عند زيادة عدد الأزرار */
+    max-height: 300px; /* تحديد أقصى ارتفاع للقائمة */
+    box-sizing: border-box;
+}
+
+/* تنسيق الأزرار داخل القائمة */
+.dropdown-menu button {
+    background-color: transparent;
+    border: none;
+    color: black;
+    padding: 8px 12px;
+    text-align: right;
+    cursor: pointer;
+    width: 100%; /* جعل الزر يأخذ عرض القائمة بالكامل */
+    word-wrap: break-word; /* السماح بتقسيم النص الطويل */
+    white-space: normal; /* تمكين التفاف النص */
+    font-size: 14px; /* حجم الخط */
+}
+
+.dropdown-menu button:hover {
+    background-color: #f0f0f0;
+}
+
+/* تنسيق النصوص الطويلة */
+.dropdown-menu button {
+    display: block;
+}
+
