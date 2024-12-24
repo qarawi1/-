@@ -24,11 +24,11 @@ input {
 button {
     background-color: #306EFF;
     color: white;
-    padding: 8px 16px; /* تقليل حجم الأزرار */
+    padding: 6px 12px; /* تقليل الحشو */
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px; /* تقليل حجم الخط في الأزرار */
+    font-size: 14px;
 }
 
 button:hover {
@@ -37,20 +37,24 @@ button:hover {
 
 #appContent {
     display: flex;
-    flex-direction: column; /* جعل العناصر ترتب عموديًا */
-    overflow-x: auto;
-    width: 100%;
-    height: 100vh;
+    flex-direction: column;
+    overflow: hidden; /* منع التمرير على الحاوية الأساسية */
+    padding-top: 50px; /* إضافة مسافة لتفادي الشريط العلوي */
+    height: 100vh; /* ملء الشاشة بالكامل */
     box-sizing: border-box;
-    padding: 10px; /* إضافة مسافة داخل الحاوية */
 }
 
 .top-bar {
     background-color: #306EFF;
     color: white;
-    padding: 8px;
+    padding: 5px 10px; /* تقليل الحشو */
     text-align: center;
-    font-size: 18px; /* تصغير حجم النص في الشريط العلوي */
+    font-size: 16px; /* تصغير حجم النص */
+    position: fixed; /* تثبيت الشريط العلوي */
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .search-container {
@@ -66,17 +70,26 @@ button:hover {
     border-radius: 5px;
 }
 
-#motorsTable th, #motorsTable td {
+#motorTableContainer {
+    flex-grow: 1;
+    overflow-y: auto; /* تفعيل التمرير العمودي فقط على الجدول */
     padding: 10px;
-    text-align: right;
-    border: 1px solid #ddd;
-    font-size: 14px; /* تقليل حجم النص داخل الجدول */
+    margin-top: 15px;
 }
 
+#adminActions {
+    margin: 15px 10px;
+    text-align: center;
+}
+
+#motorsTable th, #motorsTable td {
+    padding: 8px; /* تقليل الحشو داخل الجدول */
+    text-align: right;
+    border: 1px solid #ddd;
+}
 #motorsTable {
     border-collapse: collapse;
     width: 100%;
-    margin-top: 15px;
 }
 
 #motorsTable th {
@@ -128,4 +141,10 @@ button:hover {
     background-color: #f4f4f4;
 }
 
-
+#noDataMessage {
+    text-align: center;
+    color: red;
+    font-weight: bold;
+    font-size: 18px; /* تقليل حجم النص */
+    margin-top: 10px;
+}
