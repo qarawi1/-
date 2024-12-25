@@ -363,3 +363,31 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
     });
 });
+
+// التحقق من إصدار التطبيق
+document.addEventListener("DOMContentLoaded", async () => {
+    const localVersionCode = 1; // رقم إصدار التطبيق الحالي
+
+    try {
+        // جلب رقم الإصدار الأحدث من Firestore
+        const appInfoRef = doc(firestore, "appInfo", "version");
+        const appInfoSnap = await getDoc(appInfoRef);
+
+        if (appInfoSnap.exists()) {
+            const latestVersion = appInfoSnap.data().versionCode;
+            
+            if (localVersionCode < latestVersion) {
+                // إذا كان الإصدار الحالي أقل من الإصدار الأحدث
+                alert("يرجى تحديث التطبيق للحصول على أحدث الميزات.");
+                // يمكن إعادة توجيه المستخدم إلى متجر التطبيقات هنا
+                window.location.href = "https://your-app-update-link.com";
+            } else {
+                console.log("التطبيق محدث.");
+            }
+        } else {
+            console.log("لم يتم العثور على بيانات الإصدار في Firestore.");
+        }
+    } catch (error) {
+        console.error("حدث خطأ أثناء التحقق من الإصدار:", error);
+    }
+});
