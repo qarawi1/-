@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // التحقق من إصدار التطبيق
 document.addEventListener("DOMContentLoaded", async () => {
-    const localVersionCode = 1; // رقم إصدار التطبيق الحالي
+    const localVersionCode = 3.2; // رقم إصدار التطبيق الحالي
 
     try {
         // جلب رقم الإصدار الأحدث من Firestore
