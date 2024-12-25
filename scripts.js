@@ -368,6 +368,12 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener("DOMContentLoaded", async () => {
     const localVersionCode = 3.2; // رقم إصدار التطبيق الحالي
 
+    // وظيفة للتحقق من بيئة التشغيل (موبايل أم متصفح)
+    function isMobileApp() {
+        // كشف إذا كان التطبيق يعمل داخل WebView (بيئة الموبايل)
+        return /wv|Android|iPhone|Mobile/i.test(navigator.userAgent);
+    }
+
     try {
         // جلب رقم الإصدار الأحدث من Firestore
         const appInfoRef = doc(firestore, "appInfo", "version");
@@ -375,12 +381,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (appInfoSnap.exists()) {
             const latestVersion = appInfoSnap.data().versionCode;
-            
+
             if (localVersionCode < latestVersion) {
-                // إذا كان الإصدار الحالي أقل من الإصدار الأحدث
-                alert("يرجى تحديث التطبيق للحصول على أحدث الميزات.");
-                // يمكن إعادة توجيه المستخدم إلى متجر التطبيقات هنا
-                window.location.href = "https://your-app-update-link.com";
+                // إذا كان الإصدار الحالي أقل من الإصدار الأحدث وتطبيق الموبايل فقط
+                if (isMobileApp()) {
+                    alert("يرجى تحديث التطبيق للحصول على أحدث الميزات.");
+                    // يمكن إعادة توجيه المستخدم إلى متجر التطبيقات هنا
+                    window.location.href = "https://your-app-update-link.com";
+                } else {
+                    console.log("التطبيق يعمل على المتصفح، لن تظهر الرسالة.");
+                }
             } else {
                 console.log("التطبيق محدث.");
             }
@@ -391,3 +401,4 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("حدث خطأ أثناء التحقق من الإصدار:", error);
     }
 });
+
