@@ -83,8 +83,20 @@ async function searchMotor() {
     const tableBody = document.getElementById("motorsTable").getElementsByTagName("tbody")[0];
 	    const noDataMessage = document.getElementById("noDataMessage"); // إضافة مرجع للرسالة
     tableBody.innerHTML = ""; // تفريغ الجدول
+	
+	
+    // إذا كان حقل البحث فارغًا، تنظيف الجدول وإظهار رسالة
+    if (searchQuery.trim() === "") {
+        noDataMessage.style.display = 'block'; // إظهار رسالة "لا توجد نتائج"
+        noDataMessage.textContent = "الرجاء إدخال موديل للبحث."; // تخصيص الرسالة
+        return; // إيقاف التنفيذ هنا
+    } else {
+        noDataMessage.style.display = 'none'; // إخفاء الرسالة إذا كان هناك نص للبحث
+    }
 
     try {
+        showLoading();
+		
         // جلب البيانات من Firebase
         const motorsCollectionRef = collection(firestore, "motors");
         const motorsSnapshot = await getDocs(motorsCollectionRef);
