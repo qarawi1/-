@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // التحقق من إصدار التطبيق
 document.addEventListener("DOMContentLoaded", async () => {
-    const localVersionCode = 3.1.0; // رقم إصدار التطبيق الحالي
+    const localVersionCode = 3.1; // رقم إصدار التطبيق الحالي
 
     // وظيفة للتحقق من بيئة التشغيل (موبايل أم متصفح)
     function isMobileApp() {
