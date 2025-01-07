@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دردشة الفنيين</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+            padding: 0;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        #chatContainer {
+            max-width: 100%;
+            height: 100vh;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #chat {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .message.sent {
+            align-items: flex-start;
+        }
+        .message .bubble {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            background-color: #306EFF;
+            color: #fff;
+            position: relative;
+            word-wrap: break-word;
+        }
+        .message.sent .bubble {
+            background-color: #e0e0e0;
+            color: #000;
+        }
+        .message .bubble::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: -10px;
+            width: 0;
+            height: 0;
+            border: 5px solid transparent;
+            border-top-color: #306EFF;
+            border-left-color: #306EFF;
+        }
+        .message.sent .bubble::after {
+            left: -10px;
+            right: auto;
+            border-top-color: #e0e0e0;
+            border-left-color: #e0e0e0;
+            border-right-color: transparent;
+        }
+        #messageInputContainer {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+            align-items: center;
+        }
+        #messageInput {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+            outline: none;
+        }
+        #sendButton, #fileInput, #emojiButton {
+            padding: 10px;
+            background-color: #306EFF;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        #sendButton:hover, #fileInput:hover, #emojiButton:hover {
+            background-color: #2554a8;
+        }
+        #fileInput {
+            display: none;
+        }
+        .file-label {
+            padding: 10px;
+            background-color: #306EFF;
+            color: #fff;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .emoji-picker {
+            position: absolute;
+            bottom: 60px;
+            right: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            display: none;
+            flex-wrap: wrap;
+            width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .emoji-picker span {
+            cursor: pointer;
+            font-size: 20px;
+            margin: 5px;
+        }
+        @media (max-width: 600px) {
+            #chatContainer {
+                height: 100vh;
+                border-radius: 0;
+            }
+            #messageInputContainer {
+                padding: 5px;
+            }
+            #messageInput {
+                padding: 8px;
+            }
+            #sendButton, #fileInput, #emojiButton {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="chatContainer">
+        <div id="chat"></div>
+        <div id="messageInputContainer">
+            <input type="text" id="messageInput" placeholder="اكتب رسالتك هنا...">
+            <label for="fileInput" class="file-label">📎</label>
+            <input type="file" id="fileInput" accept="image/*">
+            <button id="emojiButton">😊</button>
+            <button id="sendButton">إرسال</button>
+        </div>
+        <div class="emoji-picker" id="emojiPicker">
+            <span>😀</span>
+            <span>😂</span>
+            <span>😍</span>
+            <span>😎</span>
+            <span>👍</span>
+            <span>👋</span>
+            <span>🎉</span>
+            <span>❤️</span>
+            <span>🔥</span>
+            <span>💡</span>
+        </div>
+    </div>
+
+    <script src="chat.js"></script>
+</body>
+</html>

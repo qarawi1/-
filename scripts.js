@@ -414,3 +414,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
+// إضافة وظيفة لإعادة توجيه المستخدم عند النقر على زر "الدردشة"
+    document.getElementById("chatButton").addEventListener("click", function () {
+        window.location.href = "chat.html"; // إعادة التوجيه إلى صفحة الدردشة
+    });
