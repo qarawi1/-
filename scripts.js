@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC5ZE1m5qe10pbAiZcSjBkIVDVNZExtf5U",
@@ -415,6 +415,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // إضافة وظيفة لإعادة توجيه المستخدم عند النقر على زر "الدردشة"
-    document.getElementById("chatButton").addEventListener("click", function () {
+    document.getElementById("matgButton").addEventListener("click", function () {
         window.location.href = "matg.html"; // إعادة التوجيه إلى صفحة الدردشة
+    });
+	
+	    document.getElementById("appoButton").addEventListener("click", function () {
+        window.location.href = "appo.html"; // إعادة التوجيه إلى صفحة الدردشة
     });

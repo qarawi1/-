@@ -1,0 +1,84 @@
+/* تنسيق عام */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  direction: rtl;
+  background-color: #f9f9f9;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #007bff;
+  color: white;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+.upcoming-btn {
+  background-color: #ff9800;
+  border: none;
+  padding: 10px 20px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+h2 {
+  color: #333;
+  margin: 20px 0 10px;
+}
+
+.appointments-section, .pending-section {
+  padding: 20px;
+}
+
+.appointments-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.appointments-table th, .appointments-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.appointments-table th {
+  background-color: #007bff;
+  color: white;
+}
+
+.floating-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 30px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.missed-section {
+  padding: 20px;
+}
+
+.missed-section h2 {
+  color: #d9534f; /* لون مميز للمواعيد الفائتة */
+}
+
+

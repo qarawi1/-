@@ -1,99 +1,129 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
+// فتح أو إنشاء قاعدة بيانات
+let db;
+const request = indexedDB.open('MotorStoreDB', 1);
 
-// تكوين Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyC5ZE1m5qe10pbAiZcSjBkIVDVNZExtf5U",
-    authDomain: "elferdaws-1a362.firebaseapp.com",
-    projectId: "elferdaws-1a362",
-    storageBucket: "elferdaws-1a362.firebasestorage.app",
-    messagingSenderId: "74289958469",
-    appId: "1:74289958469:web:4ab94014a6afc191b61d2c"
+request.onupgradeneeded = function (event) {
+    db = event.target.result;
+    if (!db.objectStoreNames.contains('products')) {
+        db.createObjectStore('products', { keyPath: 'id', autoIncrement: true });
+    }
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+request.onsuccess = function (event) {
+    db = event.target.result;
+    loadProducts(); // تحميل المنتجات عند فتح الصفحة
+};
 
-// عناصر الواجهة
-const storeContent = document.getElementById('storeContent');
-const addProductForm = document.getElementById('addProductForm');
-const showStoreBtn = document.getElementById('showStoreBtn');
-const showAddProductBtn = document.getElementById('showAddProductBtn');
-const saveProductBtn = document.getElementById('saveProductBtn');
-const cancelProductBtn = document.getElementById('cancelProductBtn');
+request.onerror = function (event) {
+    console.error('Error opening database:', event.target.error);
+};
 
-// عرض المتجر وإخفاء نموذج الإضافة
-showStoreBtn.addEventListener('click', () => {
-    storeContent.style.display = 'block';
-    addProductForm.style.display = 'none';
-    loadProducts(); // إعادة تحميل المنتجات
-});
+// دالة لإضافة منتج جديد
+function addProduct(product) {
+    const transaction = db.transaction('products', 'readwrite');
+    const store = transaction.objectStore('products');
+    const request = store.add(product);
 
-// عرض نموذج الإضافة وإخفاء المتجر
-showAddProductBtn.addEventListener('click', () => {
-    storeContent.style.display = 'none';
-    addProductForm.style.display = 'block';
-});
+    request.onsuccess = function () {
+        alert('تمت إضافة المنتج بنجاح!');
+        loadProducts(); // إعادة تحميل المنتجات
+    };
+
+    request.onerror = function (event) {
+        console.error('Error adding product:', event.target.error);
+    };
+}
+
+// دالة لحذف المنتج
+window.deleteProduct = function (productId) {
+    const transaction = db.transaction('products', 'readwrite');
+    const store = transaction.objectStore('products');
+    const request = store.delete(productId);
+
+    request.onsuccess = function () {
+        alert('تم حذف المنتج بنجاح!');
+        loadProducts(); // إعادة تحميل المنتجات بعد الحذف
+    };
+
+    request.onerror = function (event) {
+        console.error('Error deleting product:', event.target.error);
+    };
+};
 
 // دالة لجلب وعرض المنتجات
-async function loadProducts() {
-    const productsList = document.getElementById('productsList');
-    productsList.innerHTML = ''; // مسح المحتوى الحالي
+function loadProducts() {
+    const productsGrid = document.querySelector('.products-grid');
+    productsGrid.innerHTML = ''; // مسح المحتوى الحالي
 
-    const querySnapshot = await getDocs(collection(db, 'products'));
-    querySnapshot.forEach((doc) => {
-        const product = doc.data();
-        const productCard = `
-            <div class="product-card">
-                <img src="${product.imageUrl}" alt="${product.name}">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <div class="price">${product.price} جنيه</div>
-            </div>
-        `;
-        productsList.innerHTML += productCard;
-    });
+    // جلب المنتجات من IndexedDB
+    const transaction = db.transaction('products', 'readonly');
+    const store = transaction.objectStore('products');
+    const request = store.getAll();
+
+    request.onsuccess = function () {
+        const products = request.result;
+
+        // عرض المنتجات
+        products.forEach(product => {
+            const productCard = `
+                <div class="product-card">
+                    <img src="${product.imageUrl || product.image}" alt="${product.name}">
+                    <div class="details">
+                        <h3>${product.name}</h3>
+                        <p class="price">${product.price}</p>
+                        <button class="delete-btn" onclick="deleteProduct(${product.id})">حذف</button>
+                    </div>
+                </div>
+            `;
+            productsGrid.innerHTML += productCard;
+        });
+    };
+
+    request.onerror = function (event) {
+        console.error('Error loading products:', event.target.error);
+    };
 }
 
 // دالة لحفظ المنتج
-saveProductBtn.addEventListener('click', async () => {
+document.getElementById('saveProductBtn').addEventListener('click', () => {
     const name = document.getElementById('productName').value;
     const price = document.getElementById('productPrice').value;
     const description = document.getElementById('productDescription').value;
     const imageFile = document.getElementById('productImage').files[0];
 
     if (name && price && description && imageFile) {
-        try {
-            // رفع الصورة إلى Firebase Storage
-            const storageRef = ref(storage, 'product-images/' + imageFile.name);
-            await uploadBytes(storageRef, imageFile);
-            const imageUrl = await getDownloadURL(storageRef);
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const imageUrl = event.target.result; // تحويل الصورة إلى Base64
 
-            // إضافة المنتج إلى Firestore
-            await addDoc(collection(db, 'products'), {
+            const product = {
                 name: name,
                 price: price,
                 description: description,
                 imageUrl: imageUrl
-            });
+            };
 
-            alert('تمت إضافة المنتج بنجاح!');
-            showStoreBtn.click(); // العودة إلى صفحة المتجر
-        } catch (error) {
-            console.error("Error adding product: ", error);
-        }
+            addProduct(product); // إضافة المنتج إلى IndexedDB
+        };
+        reader.readAsDataURL(imageFile); // تحويل الصورة إلى Base64
     } else {
         alert('يرجى ملء جميع الحقول!');
     }
 });
 
-// إلغاء الإضافة والعودة إلى صفحة المتجر
-cancelProductBtn.addEventListener('click', () => {
-    showStoreBtn.click();
+// التنقل بين الصفحات
+document.getElementById('showStoreBtn').addEventListener('click', () => {
+    document.getElementById('storeContent').style.display = 'block';
+    document.getElementById('addProductForm').style.display = 'none';
+    loadProducts(); // إعادة تحميل المنتجات
 });
 
-// تحميل المنتجات عند فتح الصفحة
-window.addEventListener('load', loadProducts);
+document.getElementById('showAddProductBtn').addEventListener('click', () => {
+    document.getElementById('storeContent').style.display = 'none';
+    document.getElementById('addProductForm').style.display = 'block';
+});
+
+// إلغاء الإضافة والعودة إلى صفحة المتجر
+document.getElementById('cancelProductBtn').addEventListener('click', () => {
+    document.getElementById('showStoreBtn').click();
+});

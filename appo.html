@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة المواعيد</title>
+  <link rel="stylesheet" href="appo.css">
+</head>
+<body>
+  <!-- العنوان -->
+  <header class="header">
+    <h1>مواعيد اليوم - <span id="current-date"></span></h1>
+  </header>
+  
+      <button class="upcoming-btn" onclick="showUpcomingAppointments()">المواعيد القادمة</button>
+
+
+<!-- جدول المواعيد الفائتة -->
+<section class="missed-section">
+  <h2>المواعيد الفائتة</h2>
+  <table id="missed-appointments" class="appointments-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>رقم الموعد</th>
+        <th>اسم العميل</th>
+        <th>وقت الموعد</th>
+        <th>التاريخ</th>
+        <th>رقم الهاتف</th>
+        <th>رقم هاتف آخر</th>
+        <th>العنوان</th>
+        <th>المشكلة</th>
+        <th>نوع الجهاز</th>
+        <th>اسم الجهاز</th>
+        <th>إجراء</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- يتم ملء البيانات ديناميكياً -->
+    </tbody>
+  </table>
+</section>
+
+
+  <!-- جدول مواعيد اليوم -->
+  <section class="appointments-section">
+  <h2>مواعيد اليوم</h2>
+  <table id="today-appointments" class="appointments-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>رقم الموعد</th>
+        <th>اسم العميل</th>
+        <th>وقت الموعد</th>
+        <th>رقم الهاتف</th>
+        <th>رقم هاتف آخر</th>
+        <th>العنوان</th>
+        <th>المشكلة</th>
+        <th>نوع الجهاز</th>
+        <th>اسم الجهاز</th>
+        <th>إجراء</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- يتم ملء البيانات ديناميكياً -->
+    </tbody>
+  </table>
+</section>
+
+
+  <!-- جدول المستخدمين بانتظار موعد -->
+  <section class="pending-section">
+    <h2>مستخدمين بانتظار تحديد موعد</h2>
+    <table id="pending-users" class="appointments-table">
+      <thead>
+        <tr>
+            <th>#</th>
+        <th>اسم العميل</th>
+        <th>رقم الهاتف</th>
+        <th>رقم هاتف آخر</th>
+        <th>العنوان</th>
+        <th>المشكلة</th>
+        <th>نوع الجهاز</th>
+        <th>اسم الجهاز</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- يتم ملء البيانات ديناميكياً -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- أيقونة إضافة موعد -->
+  <button class="floating-btn" onclick="addNewAppointment()">+</button>
+
+  <script src="appo.js"></script>
+</body>
+</html>

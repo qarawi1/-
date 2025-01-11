@@ -4,44 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متجر العدد اليدوية</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="matg.css">
     <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js"></script>
-    <script type="module" src="app.js"></script>
+    <script type="module" src="matg.js"></script>
 </head>
 <body>
     <!-- شريط التنقل -->
-    <div class="top-bar">
-        <button id="showStoreBtn">عرض المتجر</button>
-        <button id="showAddProductBtn">إضافة منتج جديد</button>
+    <div class="top-bar"></button>
     </div>
+	
+	<!-- قسم الأزرار -->
+<div class="actions-bar">
+    <button id="showStoreBtn">عرض المنتجات</button>
+    <button id="showAddProductBtn">إضافة منتج جديد</button>
+</div>
 
-    <!-- قسم عرض المنتجات -->
-    <div id="storeContent">
-        <h2>متجر العدد اليدوية</h2>
-        <div id="productsList" class="products-grid"></div>
+<!-- قسم عرض المنتجات -->
+<div id="storeContent">
+    <div class="products-grid">
+        <!-- المنتجات ستضاف هنا ديناميكيًا باستخدام JavaScript -->
     </div>
+</div>
 
-    <!-- قسم إضافة منتج جديد -->
-    <div id="addProductForm" style="display: none;">
+<!-- قسم إضافة منتج جديد -->
+<div id="addProductForm" style="display: none;">
+    <div class="form-header">
         <h2>إضافة منتج جديد</h2>
-        <label for="productName">اسم المنتج:</label>
-        <input type="text" id="productName" placeholder="اسم المنتج">
-
-        <label for="productPrice">السعر:</label>
-        <input type="number" id="productPrice" placeholder="السعر">
-
-        <label for="productDescription">الوصف:</label>
-        <textarea id="productDescription" placeholder="وصف المنتج"></textarea>
-
-        <label for="productImage">صورة المنتج:</label>
-        <input type="file" id="productImage" accept="image/*">
-
-        <button id="saveProductBtn">حفظ المنتج</button>
-        <button id="cancelProductBtn">إلغاء</button>
     </div>
-	    <script type="module" src="matg.js"></script>
+    <div class="form-content">
+        <div class="form-group">
+            <label for="productName">اسم المنتج:</label>
+            <input type="text" id="productName" placeholder="اسم المنتج">
+        </div>
+        <div class="form-group">
+            <label for="productPrice">السعر:</label>
+            <input type="number" id="productPrice" placeholder="السعر">
+        </div>
+        <div class="form-group">
+            <label for="productDescription">الوصف:</label>
+            <textarea id="productDescription" placeholder="وصف المنتج"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="productImage">صورة المنتج:</label>
+            <input type="file" id="productImage" accept="image/*">
+        </div>
+        <div class="form-actions">
+            <button id="saveProductBtn">حفظ المنتج</button>
+            <button id="cancelProductBtn">إلغاء</button>
+        </div>
+    </div>
+</div>
+<script type="module" src="matg.js"></script>
 
 </body>
 </html>
