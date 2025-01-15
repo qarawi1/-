@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>إدارة المواعيد</title>
   <link rel="stylesheet" href="appo.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <!-- العنوان -->
@@ -12,13 +13,189 @@
     <h1>مواعيد اليوم - <span id="current-date"></span></h1>
   </header>
   
-      <button class="upcoming-btn" onclick="showUpcomingAppointments()">المواعيد القادمة</button>
+  
+  <!-- حاوية الأزرار العلوية -->
+<div class="button-container">
+  <button class="upcoming-btn" onclick="showUpcomingAppointments()">المواعيد القادمة</button>
+  <button class="history-btn" onclick="showHistory()">سجل المواعيد</button>
+</div>
 
+  <!-- واجهة إضافة موعد جديد -->
+  <section id="add-appointment-section" class="add-appointment-section" style="display: none;">
+    <h2>إضافة موعد جديد</h2>
+    <form id="add-appointment-form">
+      <label for="appointment-number">رقم الموعد:</label>
+      <input type="text" id="appointment-number" required>
+      
+      <label for="client-name">اسم العميل:</label>
+      <input type="text" id="client-name" required>
+      
+      <label for="appointment-time">وقت الموعد:</label>
+      <input type="time" id="appointment-time" required>
+      
+      <label for="appointment-date">تاريخ الموعد:</label>
+      <input type="date" id="appointment-date" required>
+      
+      <label for="phone">رقم الهاتف:</label>
+      <input type="text" id="phone" required>
+      
+      <label for="alt-phone">رقم هاتف آخر:</label>
+      <input type="text" id="alt-phone">
+      
+      <label for="address">العنوان:</label>
+      <input type="text" id="address" required>
+      
+      <label for="issue">المشكلة:</label>
+      <input type="text" id="issue" required>
+      
+      <label for="device-type">نوع الجهاز:</label>
+      <input type="text" id="device-type" required>
+      
+      <label for="device-name">اسم الجهاز:</label>
+      <input type="text" id="device-name" required>
+      
+      <label for="notes">ملاحظات:</label>
+      <textarea id="notes"></textarea>
+      
+      <button type="button" onclick="saveAppointment()">حفظ الموعد</button>
+      <button type="button" onclick="cancelAddAppointment()">إلغاء</button>
+    </form>
+  </section>
 
-<!-- جدول المواعيد الفائتة -->
-<section class="missed-section">
-  <h2>المواعيد الفائتة</h2>
-  <table id="missed-appointments" class="appointments-table">
+  <!-- جدول المواعيد الفائتة -->
+  <section class="missed-section">
+    <h2>المواعيد الفائتة</h2>
+    <table id="missed-appointments" class="appointments-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>رقم الموعد</th>
+          <th>اسم العميل</th>
+          <th>وقت الموعد</th>
+          <th>التاريخ</th>
+          <th>رقم الهاتف</th>
+          <th>رقم هاتف آخر</th>
+          <th>العنوان</th>
+          <th>المشكلة</th>
+          <th>نوع الجهاز</th>
+          <th>اسم الجهاز</th>
+          <th>ملاحظات</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- يتم ملء البيانات ديناميكياً -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- جدول مواعيد اليوم -->
+  <section class="appointments-section">
+    <h2>مواعيد اليوم</h2>
+    <table id="today-appointments" class="appointments-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>رقم الموعد</th>
+          <th>اسم العميل</th>
+          <th>وقت الموعد</th>
+          <th>رقم الهاتف</th>
+          <th>رقم هاتف آخر</th>
+          <th>العنوان</th>
+          <th>المشكلة</th>
+          <th>نوع الجهاز</th>
+          <th>اسم الجهاز</th>
+          <th>ملاحظات</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- يتم ملء البيانات ديناميكياً -->
+      </tbody>
+    </table>
+  </section>
+
+<!-- جدول المواعيد القادمة -->
+<section id="upcoming-section" class="upcoming-section" style="display: none;">
+  <!-- شريط علوي -->
+  <div class="upcoming-header">
+    <button class="back-btn" onclick="showMainContent()">العودة</button>
+    <h2>المواعيد القادمة</h2>
+    <select id="filter-method" onchange="changeFilterMethod()">
+      <option value="date">فلترة بالتاريخ والوقت</option>
+      <option value="name">فلترة بالاسم أو الرقم</option>
+    </select>
+  </div>
+
+  <!-- فلترة بالتاريخ والوقت -->
+  <div id="date-filter" class="filter-section">
+    <label for="filter-date">اختر التاريخ:</label>
+    <input type="date" id="filter-date" onchange="filterUpcomingAppointments()">
+  </div>
+
+  <!-- فلترة بالاسم أو الرقم -->
+  <div id="name-filter" class="filter-section" style="display: none;">
+    <label for="search-input">ابحث بالاسم أو الرقم:</label>
+    <input type="text" id="search-input" placeholder="ادخل الاسم أو الرقم" oninput="filterUpcomingAppointments()">
+  </div>
+
+  <!-- جدول المواعيد القادمة -->
+  <table id="upcoming-appointments" class="appointments-table">
+  
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>رقم الموعد</th>
+          <th>اسم العميل</th>
+          <th>وقت الموعد</th>
+          <th>التاريخ</th>
+          <th>رقم الهاتف</th>
+          <th>رقم هاتف آخر</th>
+          <th>العنوان</th>
+          <th>المشكلة</th>
+          <th>نوع الجهاز</th>
+          <th>اسم الجهاز</th>
+          <th>ملاحظات</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- يتم ملء البيانات ديناميكياً -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- جدول المستخدمين بانتظار موعد -->
+  <section class="pending-section">
+    <h2>مستخدمين بانتظار تحديد موعد</h2>
+    <table id="pending-users" class="appointments-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>اسم العميل</th>
+          <th>رقم الهاتف</th>
+          <th>رقم هاتف آخر</th>
+          <th>العنوان</th>
+          <th>المشكلة</th>
+          <th>نوع الجهاز</th>
+          <th>اسم الجهاز</th>
+          <th>ملاحظات</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- يتم ملء البيانات ديناميكياً -->
+      </tbody>
+    </table>
+  </section>
+
+  <!-- أيقونة إضافة موعد -->
+  <button class="floating-btn" onclick="showAddAppointment()">+</button>
+
+<!-- جدول سجل المواعيد -->
+<section id="history-section" class="history-section" style="display: none;">
+  <h2>سجل المواعيد</h2>
+  <table id="history-appointments" class="appointments-table">
     <thead>
       <tr>
         <th>#</th>
@@ -32,7 +209,8 @@
         <th>المشكلة</th>
         <th>نوع الجهاز</th>
         <th>اسم الجهاز</th>
-        <th>إجراء</th>
+        <th>ملاحظات</th>
+        <th>الإجراء</th>
       </tr>
     </thead>
     <tbody>
@@ -40,59 +218,6 @@
     </tbody>
   </table>
 </section>
-
-
-  <!-- جدول مواعيد اليوم -->
-  <section class="appointments-section">
-  <h2>مواعيد اليوم</h2>
-  <table id="today-appointments" class="appointments-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>رقم الموعد</th>
-        <th>اسم العميل</th>
-        <th>وقت الموعد</th>
-        <th>رقم الهاتف</th>
-        <th>رقم هاتف آخر</th>
-        <th>العنوان</th>
-        <th>المشكلة</th>
-        <th>نوع الجهاز</th>
-        <th>اسم الجهاز</th>
-        <th>إجراء</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- يتم ملء البيانات ديناميكياً -->
-    </tbody>
-  </table>
-</section>
-
-
-  <!-- جدول المستخدمين بانتظار موعد -->
-  <section class="pending-section">
-    <h2>مستخدمين بانتظار تحديد موعد</h2>
-    <table id="pending-users" class="appointments-table">
-      <thead>
-        <tr>
-            <th>#</th>
-        <th>اسم العميل</th>
-        <th>رقم الهاتف</th>
-        <th>رقم هاتف آخر</th>
-        <th>العنوان</th>
-        <th>المشكلة</th>
-        <th>نوع الجهاز</th>
-        <th>اسم الجهاز</th>
-          <th>إجراء</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- يتم ملء البيانات ديناميكياً -->
-      </tbody>
-    </table>
-  </section>
-
-  <!-- أيقونة إضافة موعد -->
-  <button class="floating-btn" onclick="addNewAppointment()">+</button>
 
   <script src="appo.js"></script>
 </body>
