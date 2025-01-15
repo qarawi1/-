@@ -287,7 +287,18 @@ function displayAppointments(appointments) {
 
 // إظهار المواعيد القادمة
 function showUpcomingAppointments() {
-    if (checkInternetConnection()) {
+  document.getElementById('upcoming-section').style.display = 'block';
+  document.querySelector('.header').style.display = 'none';
+  document.querySelector('.upcoming-btn').style.display = 'none';
+  document.querySelector('.missed-section').style.display = 'none';
+    document.querySelector('.history-btn').style.display = 'none'; // إخفاء زر سجل المواعيد
+  document.querySelector('.appointments-section').style.display = 'none';
+  document.querySelector('.pending-section').style.display = 'none';
+  document.getElementById('add-appointment-section').style.display = 'none';
+    document.getElementById('history-section').style.display = 'none'; // إخفاء قسم سجل المواعيد
+	  document.querySelector('.button-container').style.display = 'none'; // إخفاء حاوية الأزرار
+  filterUpcomingAppointments();
+   if (checkInternetConnection()) {
         document.getElementById('upcoming-section').style.display = 'block';
         document.querySelector('.header').style.display = 'none';
         document.querySelector('.upcoming-btn').style.display = 'none';
@@ -449,6 +460,21 @@ function showHistory() {
   document.getElementById('add-appointment-section').style.display = 'none';
   	  document.querySelector('.button-container').style.display = 'none'; // إخفاء حاوية الأزرار
   filterHistoryAppointments(); // تحميل المواعيد مع الفلترة الافتراضية
+    if (checkInternetConnection()) {
+        document.getElementById('history-section').style.display = 'block';
+        document.querySelector('.header').style.display = 'none';
+        document.querySelector('.upcoming-btn').style.display = 'none';
+        document.querySelector('.history-btn').style.display = 'none';
+        document.querySelector('.missed-section').style.display = 'none';
+        document.querySelector('.appointments-section').style.display = 'none';
+        document.querySelector('.pending-section').style.display = 'none';
+        document.getElementById('upcoming-section').style.display = 'none';
+        document.getElementById('add-appointment-section').style.display = 'none';
+        document.querySelector('.button-container').style.display = 'none';
+        filterHistoryAppointments();
+    } else {
+        showConnectionMessage();
+    }
 }
 
 // متغير لتتبع الصفحة الحالية
@@ -500,21 +526,16 @@ function showUpcomingAppointments() {
 
 // إظهار سجل المواعيد
 function showHistory() {
-    if (checkInternetConnection()) {
-        document.getElementById('history-section').style.display = 'block';
-        document.querySelector('.header').style.display = 'none';
-        document.querySelector('.upcoming-btn').style.display = 'none';
-        document.querySelector('.history-btn').style.display = 'none';
-        document.querySelector('.missed-section').style.display = 'none';
-        document.querySelector('.appointments-section').style.display = 'none';
-        document.querySelector('.pending-section').style.display = 'none';
-        document.getElementById('upcoming-section').style.display = 'none';
-        document.getElementById('add-appointment-section').style.display = 'none';
-        document.querySelector('.button-container').style.display = 'none';
-        filterHistoryAppointments();
-    } else {
-        showConnectionMessage();
-    }
+  document.getElementById('history-section').style.display = 'block';
+  document.querySelector('.header').style.display = 'none';
+  document.querySelector('.button-container').style.display = 'none';
+  document.querySelector('.missed-section').style.display = 'none';
+  document.querySelector('.appointments-section').style.display = 'none';
+  document.querySelector('.pending-section').style.display = 'none';
+  document.getElementById('upcoming-section').style.display = 'none';
+  document.getElementById('add-appointment-section').style.display = 'none';
+  currentSection = "history"; // تحديث المتغير ليعكس الصفحة الحالية
+  filterHistoryAppointments();
 }
 
 // إظهار واجهة إضافة موعد جديد
