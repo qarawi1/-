@@ -120,7 +120,6 @@
   <!-- شريط علوي -->
   <div class="upcoming-header">
     <button class="back-btn" onclick="showMainContent()">العودة</button>
-    <h2>المواعيد القادمة</h2>
     <select id="filter-method" onchange="changeFilterMethod()">
       <option value="date">فلترة بالتاريخ والوقت</option>
       <option value="name">فلترة بالاسم أو الرقم</option>
@@ -141,7 +140,7 @@
 
   <!-- جدول المواعيد القادمة -->
   <table id="upcoming-appointments" class="appointments-table">
-  
+      <h2>المواعيد القادمة</h2>
       <thead>
         <tr>
           <th>#</th>
@@ -194,6 +193,29 @@
 
 <!-- جدول سجل المواعيد -->
 <section id="history-section" class="history-section" style="display: none;">
+  
+    <!-- شريط علوي -->
+  <div class="history-header">
+    <button class="back-btn" onclick="showMainContent()">العودة</button>
+    <select id="history-filter-method" onchange="changeHistoryFilterMethod()">
+      <option value="date">فرز بالتاريخ والوقت</option>
+      <option value="name">فرز بالاسم ورقم الهاتف</option>
+    </select>
+  </div>
+
+  <!-- فلترة بالتاريخ والوقت -->
+  <div id="history-date-filter" class="filter-section">
+    <label for="history-filter-date">اختر التاريخ:</label>
+    <input type="date" id="history-filter-date" onchange="filterHistoryAppointments()">
+  </div>
+
+  <!-- فلترة بالاسم ورقم الهاتف -->
+  <div id="history-name-filter" class="filter-section" style="display: none;">
+    <label for="history-search-input">ابحث بالاسم أو رقم الهاتف:</label>
+    <input type="text" id="history-search-input" placeholder="ادخل الاسم أو رقم الهاتف" oninput="filterHistoryAppointments()">
+  </div>
+
+
   <h2>سجل المواعيد</h2>
   <table id="history-appointments" class="appointments-table">
     <thead>
@@ -218,6 +240,10 @@
     </tbody>
   </table>
 </section>
+
+<div id="connectionMessage" style="display: none; text-align: center; color: red; font-weight: bold;">
+    هذا القسم يحتاج إلى اتصال بالإنترنت.
+</div>
 
   <script src="appo.js"></script>
 </body>

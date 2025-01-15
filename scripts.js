@@ -422,3 +422,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 	    document.getElementById("appoButton").addEventListener("click", function () {
         window.location.href = "appo.html"; // إعادة التوجيه إلى صفحة الدردشة
     });
+	
+	// دالة التحقق من الانترنت
+document.getElementById("appoButton").addEventListener("click", function () {
+    window.location.href = "appo.html"; // قسم المواعيد يعمل بدون اتصال
+});
+
+document.getElementById("matgButton").addEventListener("click", function () {
+    if (checkInternetConnection()) {
+        window.location.href = "matg.html"; // قسم المتجر يحتاج إلى اتصال
+    } else {
+        document.getElementById("connectionMessage").style.display = "block";
+    }
+});

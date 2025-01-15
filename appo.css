@@ -239,7 +239,7 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0;
+  padding: 4px;
   background-color: #007bff;
   color: white;
   margin-bottom: 10px;
@@ -332,4 +332,52 @@ h2 {
   border-radius: 5px;
   cursor: pointer;
   font-size: 0.9rem;
+}
+
+/* تنسيقات شريط سجل المواعيد */
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px;
+  background-color: #007bff;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.history-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.history-header select {
+  padding: 5px;
+  border-radius: 5px;
+  border: none;
+  background-color: white;
+  color: #007bff;
+  cursor: pointer;
+}
+
+.back-btn {
+  background-color: #ff9800;
+  border: none;
+  padding: 5px 10px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.filter-section {
+  margin-bottom: 10px;
+}
+
+.filter-section label {
+  margin-right: 10px;
+}
+
+.filter-section input {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
 }
