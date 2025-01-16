@@ -1,3 +1,30 @@
+// تحميل المواعيد من localStorage عند تحميل الصفحة
+let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+let historyAppointments = JSON.parse(localStorage.getItem('historyAppointments')) || [];
+
+// عرض تاريخ اليوم
+document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-EG');
+
+// تحميل البيانات عند فتح الصفحة
+moveUpcomingToToday();
+loadAppointments();
+
+// التحقق من الاتصال بالإنترنت بعد تحميل الصفحة
+window.addEventListener('load', () => {
+    if (!checkInternetConnection()) {
+        showConnectionMessage();
+    }
+	
+	 const connectionMessage = document.getElementById('connectionMessage');
+    if (connectionMessage) {
+        connectionMessage.style.display = 'none';
+    }
+
+    if (!checkInternetConnection()) {
+        showConnectionMessage();
+    }
+});
+
 // عرض تاريخ اليوم
 document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-EG');
 
@@ -158,13 +185,12 @@ function moveUpcomingToToday() {
 
 // تحميل المواعيد
 function loadAppointments() {
+    const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+    displayAppointments(appointments); // عرض البيانات من localStorage دائمًا
+
     if (checkInternetConnection()) {
-        // إذا كان هناك اتصال بالإنترنت، جلب البيانات من الخادم (إذا كان لديك خادم)
+        // إذا كان هناك اتصال بالإنترنت، يمكنك جلب البيانات من الخادم هنا (إذا كان لديك خادم)
         fetchAppointmentsFromServer();
-    } else {
-        // إذا لم يكن هناك اتصال بالإنترنت، جلب البيانات من localStorage
-        const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
-        displayAppointments(appointments);
     }
 }
 
@@ -561,6 +587,14 @@ function showConnectionMessage() {
     connectionMessage.style.textAlign = 'center';
     connectionMessage.style.color = 'red';
     connectionMessage.style.fontWeight = 'bold';
-    connectionMessage.innerText = 'هذا القسم يحتاج إلى اتصال بالإنترنت.';
+    connectionMessage.innerHTML = `
+        هذا القسم يحتاج إلى اتصال بالإنترنت.
+        <button onclick="location.reload()">إعادة المحاولة</button>
+    `;
     document.body.appendChild(connectionMessage);
+	
+	  const connectionMessage = document.getElementById('connectionMessage');
+    if (connectionMessage) {
+        connectionMessage.style.display = 'block';
+    }
 }
