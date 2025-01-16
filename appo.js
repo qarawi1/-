@@ -28,11 +28,6 @@ window.addEventListener('load', () => {
 // عرض تاريخ اليوم
 document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-EG');
 
-// تحميل المواعيد من localStorage// تحميل المواعيد من localStorage
-let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
-let historyAppointments = JSON.parse(localStorage.getItem('historyAppointments')) || [];
-
-
 
 // نقل الموعد إلى سجل المواعيد عند اتخاذ إجراء
 function moveToHistory(appointmentId, action) {
@@ -582,17 +577,7 @@ function checkInternetConnection() {
     return navigator.onLine; // تُرجع true إذا كان هناك اتصال بالإنترنت، و false إذا لم يكن هناك اتصال
 }
 
-function showConnectionMessage() {
-    const connectionMessage = document.createElement('div');
-    connectionMessage.style.textAlign = 'center';
-    connectionMessage.style.color = 'red';
-    connectionMessage.style.fontWeight = 'bold';
-    connectionMessage.innerHTML = `
-        هذا القسم يحتاج إلى اتصال بالإنترنت.
-        <button onclick="location.reload()">إعادة المحاولة</button>
-    `;
-    document.body.appendChild(connectionMessage);
-	
+function showConnectionMessage() {	
 	  const connectionMessage = document.getElementById('connectionMessage');
     if (connectionMessage) {
         connectionMessage.style.display = 'block';
