@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, initializeFirestore } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC5ZE1m5qe10pbAiZcSjBkIVDVNZExtf5U",
@@ -13,33 +13,13 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const firestore = getFirestore(app);
 
-	function checkInternetConnection() {
-    return navigator.onLine;
-}
-
-document.getElementById("matgButton").addEventListener("click", function () {
-    if (checkInternetConnection()) {
-        window.location.href = "matg.html";
-    } else {
-        document.getElementById("connectionMessage").style.display = "block";
-    }
+// تمكين دعم العمل دون اتصال باستخدام initializeFirestore
+const firestore = initializeFirestore(app, {
+    experimentalForceLongPolling: true, // تمكين دعم العمل دون اتصال
 });
 
-window.onload = function() {
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    if (!user) {
-        window.location.href = 'auth.html';
-    } else {
-        document.getElementById('appContent').style.display = 'block';
-    }
-}
-
-
-
-// التحقق إذا كان المستخدم قد سجل الدخول عند تحميل الصفحةwindow.onload = function() {
+// التحقق إذا كان المستخدم قد سجل الدخول عند تحميل الصفحة
 window.onload = function() {
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -49,7 +29,6 @@ window.onload = function() {
     } else {
         // إذا كان هناك مستخدم مسجل، عرض محتوى التطبيق
         document.getElementById('appContent').style.display = 'block';
-        
     }
 }
 
@@ -82,7 +61,6 @@ async function checkAdmin(userId) {
     }
 }
 
-
 // إضافة وظيفة لتسجيل الخروج عند النقر على الزر
 document.getElementById('logoutBtn').addEventListener('click', () => {
     // مسح بيانات المستخدم من localStorage
@@ -92,21 +70,20 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
     window.location.href = 'auth.html'; // أو الصفحة التي تستخدمها لتسجيل الدخول
 });
 
-// إضافة الأقواس المفقودة في أماكن أخرى من الكود، مثل الدوال الأخرى.
-
-
-
 async function searchMotor() {
-	function showLoading() {
-    document.getElementById("loading").style.display = "block"; // تُظهر الصورة
-}
+    function showLoading() {
+        document.getElementById("loading").style.display = "block"; // تُظهر الصورة
+    }
+
+    function hideLoading() {
+        document.getElementById("loading").style.display = "none"; // تُخفي الصورة
+    }
 
     const searchQuery = document.getElementById("searchMotor").value.toLowerCase();
     const tableBody = document.getElementById("motorsTable").getElementsByTagName("tbody")[0];
-	    const noDataMessage = document.getElementById("noDataMessage"); // إضافة مرجع للرسالة
+    const noDataMessage = document.getElementById("noDataMessage"); // إضافة مرجع للرسالة
     tableBody.innerHTML = ""; // تفريغ الجدول
-	
-	
+
     // إذا كان حقل البحث فارغًا، تنظيف الجدول وإظهار رسالة
     if (searchQuery.trim() === "") {
         noDataMessage.style.display = 'block'; // إظهار رسالة "لا توجد نتائج"
@@ -118,7 +95,7 @@ async function searchMotor() {
 
     try {
         showLoading();
-		
+
         // جلب البيانات من Firebase
         const motorsCollectionRef = collection(firestore, "motors");
         const motorsSnapshot = await getDocs(motorsCollectionRef);
@@ -132,10 +109,10 @@ async function searchMotor() {
 
         if (filteredMotors.length === 0) {
             tableBody.innerHTML = "<tr><td colspan='16'>لا توجد نتائج مطابقة</td></tr>";
-						 noDataMessage.style.display = 'block'; // إظهار الرسالة
+            noDataMessage.style.display = 'block'; // إظهار الرسالة
         } else {
             // إخفاء الرسالة إذا كانت هناك نتائج
-            noDataMessage.style.display = 'none'; 
+            noDataMessage.style.display = 'none';
             // ترتيب الحقول الذي يجب عرضه
             const fieldOrder = [
                 "model",
@@ -176,14 +153,10 @@ async function searchMotor() {
     } catch (error) {
         console.error("حدث خطأ أثناء البحث:", error);
         alert("فشل البحث، يرجى المحاولة لاحقًا.");
-    }function hideLoading() {
-    document.getElementById("loading").style.display = "none"; // تُخفي الصورة
+    } finally {
+        hideLoading();
+    }
 }
-
-}
-
-
-
 
 // ربط الدالة للبيئة العامة
 window.searchMotor = searchMotor;
@@ -222,9 +195,6 @@ document.getElementById("cancelMotorBtn").addEventListener("click", () => {
 
 document.getElementById('showMotorForm').addEventListener('click', showMotorForm);
 
-// مصفوفة لتخزين بيانات الموتورات
-// لا حاجة لتعريف مكرر للمتغير motors
-
 document.getElementById("saveMotorBtn").addEventListener("click", async () => {
     console.log("تم الضغط على زر حفظ");
     const motor = {
@@ -250,7 +220,6 @@ document.getElementById("saveMotorBtn").addEventListener("click", async () => {
         await addDoc(collection(firestore, "motors"), motor);
         alert("تم حفظ البيانات بنجاح!");
 
- 
         // تفريغ الحقول بعد الحفظ
         document.getElementById("motorModel").value = "";
         document.getElementById("motorHP").value = "";
@@ -269,13 +238,11 @@ document.getElementById("saveMotorBtn").addEventListener("click", async () => {
         document.getElementById("motorRunningCapacitor").value = "";
         document.getElementById("motorStartingCapacitor").value = "";
 
-
     } catch (error) {
         console.log("حدث خطأ أثناء الحفظ:", error.message);
         alert("حدث خطأ أثناء الحفظ: " + error.message);
     }
-	    });
-
+});
 
 document.getElementById("uploadBtn").addEventListener("click", async () => {
     const fileInput = document.getElementById("fileInput");
@@ -332,7 +299,6 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
 
     reader.readAsArrayBuffer(file);
 });
-
 
 // تحميل البيانات من ملف Excel باستخدام مكتبة xlsx (على سبيل المثال)
 function loadExcelData(file) {
@@ -437,19 +403,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // إضافة وظيفة لإعادة توجيه المستخدم عند النقر على زر "الدردشة"
-    document.getElementById("matgButton").addEventListener("click", function () {
-        window.location.href = "matg.html"; // إعادة التوجيه إلى صفحة الدردشة
-    });
-	
-	    document.getElementById("appoButton").addEventListener("click", function () {
-        window.location.href = "appo.html"; // إعادة التوجيه إلى صفحة الدردشة
-    });
-	
-	// دالة التحقق من الانترنت
-document.getElementById("appoButton").addEventListener("click", function () {
-    window.location.href = "appo.html"; // قسم المواعيد يعمل بدون اتصال
-});
-
 document.getElementById("matgButton").addEventListener("click", function () {
     if (checkInternetConnection()) {
         window.location.href = "matg.html"; // قسم المتجر يحتاج إلى اتصال
@@ -457,3 +410,12 @@ document.getElementById("matgButton").addEventListener("click", function () {
         document.getElementById("connectionMessage").style.display = "block";
     }
 });
+
+document.getElementById("appoButton").addEventListener("click", function () {
+    window.location.href = "appo.html"; // قسم المواعيد يعمل بدون اتصال
+});
+
+// دالة التحقق من الانترنت
+function checkInternetConnection() {
+    return navigator.onLine;
+}
