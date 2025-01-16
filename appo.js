@@ -13,17 +13,33 @@ loadAppointments();
 window.addEventListener('load', () => {
     if (!checkInternetConnection()) {
         showConnectionMessage();
-    }
-	
-	 const connectionMessage = document.getElementById('connectionMessage');
-    if (connectionMessage) {
-        connectionMessage.style.display = 'none';
-    }
-
-    if (!checkInternetConnection()) {
-        showConnectionMessage();
+    } else {
+        hideConnectionMessage();
     }
 });
+
+// دالة لتحميل المواعيد من Firebase عند استعادة الاتصال
+window.addEventListener('online', () => {
+    if (checkInternetConnection()) {
+        fetchAppointmentsFromServer(); // جلب البيانات من Firebase
+    }
+});
+
+
+// دالة لجلب المواعيد من Firebase
+async function fetchAppointmentsFromServer() {
+    try {
+        const appointmentsCollectionRef = collection(firestore, "appointments");
+        const appointmentsSnapshot = await getDocs(appointmentsCollectionRef);
+        const appointmentsList = appointmentsSnapshot.docs.map(doc => doc.data());
+
+        // حفظ البيانات في localStorage
+        localStorage.setItem('appointments', JSON.stringify(appointmentsList));
+        loadAppointments(); // إعادة تحميل المواعيد
+    } catch (error) {
+        console.error("حدث خطأ أثناء جلب المواعيد من الخادم:", error);
+    }
+}
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js')

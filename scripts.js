@@ -423,17 +423,46 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.location.href = "appo.html"; // إعادة التوجيه إلى صفحة الدردشة
     });
 	
-	// دالة التحقق من الانترنت
-document.getElementById("appoButton").addEventListener("click", function () {
-    window.location.href = "appo.html"; // قسم المواعيد يعمل بدون اتصال
+// دالة للتحقق من الاتصال بالإنترنت
+function checkInternetConnection() {
+    return navigator.onLine; // تُرجع true إذا كان هناك اتصال بالإنترنت، و false إذا لم يكن هناك اتصال
+}
+
+// دالة لإظهار رسالة الاتصال
+function showConnectionMessage() {
+    const connectionMessage = document.getElementById('connectionMessage');
+    if (connectionMessage) {
+        connectionMessage.style.display = 'block';
+    }
+}
+
+// دالة لإخفاء رسالة الاتصال
+function hideConnectionMessage() {
+    const connectionMessage = document.getElementById('connectionMessage');
+    if (connectionMessage) {
+        connectionMessage.style.display = 'none';
+    }
+}
+
+// التحقق من الاتصال عند تحميل الصفحة
+window.addEventListener('load', () => {
+    if (!checkInternetConnection()) {
+        showConnectionMessage();
+    } else {
+        hideConnectionMessage();
+    }
 });
 
-document.getElementById("matgButton").addEventListener("click", function () {
-    if (checkInternetConnection()) {
-        window.location.href = "matg.html"; // قسم المتجر يحتاج إلى اتصال
-    } else {
-        document.getElementById("connectionMessage").style.display = "block";
-    }
+// الاستماع لتغيرات حالة الاتصال
+window.addEventListener('online', () => {
+    hideConnectionMessage();
+    // يمكنك هنا تحديث البيانات من Firebase إذا لزم الأمر
+    console.log("تم استعادة الاتصال بالإنترنت.");
+});
+
+window.addEventListener('offline', () => {
+    showConnectionMessage();
+    console.log("تم فقدان الاتصال بالإنترنت.");
 });
 
 if ('serviceWorker' in navigator) {

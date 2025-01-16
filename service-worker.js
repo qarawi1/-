@@ -1,15 +1,22 @@
-// service-worker.js
-
-const CACHE_NAME = 'app-cache-v1'; // اسم الكاش
+const CACHE_NAME = 'app-cache-v1';
 const OFFLINE_URLS = [
-    '/', // الصفحة الرئيسية
-    '/offline.html', // صفحة تظهر في حالة عدم وجود اتصال
-    '/css/styles.css', // ملفات CSS
-    '/js/app.js', // ملفات جافا سكريبت
-    '/images/logo.png' // صور ثابتة
+    '/',
+    '/offline.html',
+    '/css/styles.css',
+    '/js/scripts.js',
+    '/js/appo.js',
+    '/images/logo.png'
 ];
 
 // تثبيت Service Worker وتخزين الملفات في الكاش
+self.addEventListener('install', (event) => {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(OFFLINE_URLS);
+        })
+    );
+});
+
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
