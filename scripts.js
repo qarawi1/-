@@ -1,3 +1,15 @@
+// تحميل المواعيد من localStorage عند تحميل الصفحة
+let appointments = JSON.parse(localStorage.getItem('appointments')) || [];
+let historyAppointments = JSON.parse(localStorage.getItem('historyAppointments')) || [];
+
+
+// التحقق من الاتصال بالإنترنت بعد تحميل الصفحة
+window.addEventListener('load', () => {
+    if (!checkInternetConnection()) {
+        showConnectionMessage();
+    }
+});
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc  } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
