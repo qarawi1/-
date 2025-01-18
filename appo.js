@@ -103,16 +103,9 @@ function showAppointmentDetails(appointmentId) {
   if (appointment) {
     const detailsContent = document.getElementById('appointmentDetailsContent');
     let detailsHTML = `
-      <p><strong>رقم الموعد:</strong> ${appointment.appointmentNumber}</p>
       <p><strong>اسم العميل:</strong> ${appointment.clientName}</p>
-      <p><strong>وقت الموعد:</strong> ${appointment.time}</p>
-      <p><strong>تاريخ الموعد:</strong> ${appointment.date}</p>
-      <p><strong>رقم الهاتف:</strong> ${appointment.phone}</p>
-      <p><strong>رقم هاتف آخر:</strong> ${appointment.altPhone}</p>
-      <p><strong>العنوان:</strong> ${appointment.address}</p>
       <p><strong>المشكلة:</strong> ${appointment.issue}</p>
       <p><strong>نوع الجهاز:</strong> ${appointment.deviceType}</p>
-      <p><strong>اسم الجهاز:</strong> ${appointment.deviceName}</p>
       <p><strong>ملاحظات:</strong> ${appointment.notes}</p>
       <p><strong>الإجراء المتخذ:</strong> ${appointment.action}</p>
     `;
@@ -500,23 +493,24 @@ function filterHistoryAppointments() {
       : (appointment.clientName.toLowerCase().includes(searchInput) || appointment.phone.includes(searchInput));
 
     if (matchesFilter) {
-      historyTableBody.innerHTML += `
-        <tr>
-          <td>${index + 1}</td>
-          <td>${appointment.appointmentNumber}</td>
-          <td>${appointment.clientName}</td>
-          <td>${appointment.time}</td>
-          <td>${appointment.date}</td>
-          <td><button onclick="makeCall('${appointment.phone}')">${appointment.phone}</button></td>
-          <td><button onclick="makeCall('${appointment.altPhone}')">${appointment.altPhone}</button></td>
-          <td>${appointment.address}</td>
-          <td>${appointment.issue}</td>
-          <td>${appointment.deviceType}</td>
-          <td>${appointment.deviceName}</td>
-          <td>${appointment.notes}</td>
-          <td>${appointment.action}</td>
-        </tr>
-      `;
+historyTableBody.innerHTML += `
+  <tr onclick="showAppointmentDetails(${appointment.id})">
+    <td>${index + 1}</td>
+    <td>${appointment.appointmentNumber}</td>
+    <td>${appointment.clientName}</td>
+    <td>${appointment.time}</td>
+    <td>${appointment.date}</td>
+    <td><button onclick="makeCall('${appointment.phone}')">${appointment.phone}</button></td>
+    <td><button onclick="makeCall('${appointment.altPhone}')">${appointment.altPhone}</button></td>
+    <td>${appointment.address}</td>
+    <td>${appointment.issue}</td>
+    <td>${appointment.deviceType}</td>
+    <td>${appointment.deviceName}</td>
+    <td>${appointment.notes}</td>
+    <td>${appointment.action}</td>
+  </tr>
+`;
+
     }
   });
 }
