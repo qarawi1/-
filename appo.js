@@ -9,6 +9,13 @@ document.getElementById('current-date').innerText = new Date().toLocaleDateStrin
 moveUpcomingToToday();
 loadAppointments();
 
+function hideConnectionMessage() {
+    const connectionMessage = document.getElementById('connectionMessage');
+    if (connectionMessage) {
+        connectionMessage.style.display = 'none'; // إخفاء الرسالة
+    }
+}
+
 // التحقق من الاتصال بالإنترنت بعد تحميل الصفحة
 window.addEventListener('load', () => {
     if (!checkInternetConnection()) {
@@ -24,7 +31,6 @@ window.addEventListener('online', () => {
         fetchAppointmentsFromServer(); // جلب البيانات من Firebase
     }
 });
-
 
 // دالة لجلب المواعيد من Firebase
 async function fetchAppointmentsFromServer() {
@@ -50,7 +56,6 @@ if ('serviceWorker' in navigator) {
 // عرض تاريخ اليوم
 document.getElementById('current-date').innerText = new Date().toLocaleDateString('ar-EG');
 
-
 // نقل الموعد إلى سجل المواعيد عند اتخاذ إجراء
 function moveToHistory(appointmentId, action) {
   const appointmentIndex = appointments.findIndex(app => app.id === appointmentId);
@@ -73,7 +78,7 @@ function loadHistoryAppointments() {
 
   historyAppointments.forEach((appointment, index) => {
     historyTableBody.innerHTML += `
-      <tr>
+      <tr onclick="showAppointmentDetails(${appointment.id})">
         <td>${index + 1}</td>
         <td>${appointment.appointmentNumber}</td>
         <td>${appointment.clientName}</td>
@@ -90,6 +95,45 @@ function loadHistoryAppointments() {
       </tr>
     `;
   });
+}
+
+// دالة لعرض تفاصيل الموعد
+function showAppointmentDetails(appointmentId) {
+  const appointment = historyAppointments.find(app => app.id === appointmentId);
+  if (appointment) {
+    const detailsContent = document.getElementById('appointmentDetailsContent');
+    let detailsHTML = `
+      <p><strong>رقم الموعد:</strong> ${appointment.appointmentNumber}</p>
+      <p><strong>اسم العميل:</strong> ${appointment.clientName}</p>
+      <p><strong>وقت الموعد:</strong> ${appointment.time}</p>
+      <p><strong>تاريخ الموعد:</strong> ${appointment.date}</p>
+      <p><strong>رقم الهاتف:</strong> ${appointment.phone}</p>
+      <p><strong>رقم هاتف آخر:</strong> ${appointment.altPhone}</p>
+      <p><strong>العنوان:</strong> ${appointment.address}</p>
+      <p><strong>المشكلة:</strong> ${appointment.issue}</p>
+      <p><strong>نوع الجهاز:</strong> ${appointment.deviceType}</p>
+      <p><strong>اسم الجهاز:</strong> ${appointment.deviceName}</p>
+      <p><strong>ملاحظات:</strong> ${appointment.notes}</p>
+      <p><strong>الإجراء المتخذ:</strong> ${appointment.action}</p>
+    `;
+
+    // إضافة تفاصيل إضافية بناءً على الإجراء المتخذ
+    if (appointment.action === 'مكتمل') {
+      detailsHTML += `
+        <p><strong>تفاصيل الصيانة:</strong> ${appointment.maintenanceDetails}</p>
+        <p><strong>السعر:</strong> ${appointment.price}</p>
+        <p><strong>الوقت والتاريخ الفعلي:</strong> ${appointment.actualDateTime}</p>
+        <p><strong>قطع الغيار:</strong> ${appointment.spareParts.join(', ')}</p>
+      `;
+    } else if (appointment.action === 'ملغي') {
+      detailsHTML += `<p><strong>سبب الإلغاء:</strong> ${appointment.cancelReason}</p>`;
+    } else if (appointment.action === 'سحب للورشة') {
+      detailsHTML += `<p><strong>ملاحظات الورشة:</strong> ${appointment.workshopNotes}</p>`;
+    }
+
+    detailsContent.innerHTML = detailsHTML;
+    openModal('appointmentDetailsModal');
+  }
 }
 
 // إظهار سجل المواعيد
@@ -118,10 +162,9 @@ function showAddAppointment() {
   document.querySelector('.appointments-section').style.display = 'none';
   document.querySelector('.pending-section').style.display = 'none';
   document.getElementById('upcoming-section').style.display = 'none';
-    document.querySelector('.history-btn').style.display = 'none'; // إخفاء زر سجل المواعيد
-	  document.querySelector('.button-container').style.display = 'none'; // إخفاء حاوية الأزرار
-	      document.getElementById('history-section').style.display = 'none'; // إخفاء قسم سجل المواعيد
-
+  document.querySelector('.history-btn').style.display = 'none'; // إخفاء زر سجل المواعيد
+  document.querySelector('.button-container').style.display = 'none'; // إخفاء حاوية الأزرار
+  document.getElementById('history-section').style.display = 'none'; // إخفاء قسم سجل المواعيد
 }
 
 // إخفاء واجهة إضافة موعد جديد
@@ -133,7 +176,7 @@ function cancelAddAppointment() {
   document.querySelector('.appointments-section').style.display = 'block';
   document.querySelector('.pending-section').style.display = 'block';
   document.querySelector('.history-btn').style.display = 'block'; // إعادة عرض زر سجل المواعيد
-    document.querySelector('.button-container').style.display = 'flex'; // إعادة عرض حاوية الأزرار
+  document.querySelector('.button-container').style.display = 'flex'; // إعادة عرض حاوية الأزرار
 }
 
 // حفظ الموعد الجديد
@@ -199,7 +242,6 @@ function moveUpcomingToToday() {
   localStorage.setItem('appointments', JSON.stringify(appointments));
 }
 
-
 // تحميل المواعيد
 function loadAppointments() {
     const appointments = JSON.parse(localStorage.getItem('appointments')) || [];
@@ -249,12 +291,10 @@ function displayAppointments(appointments) {
                     <select onchange="handleActionChange(this, ${appointment.id})">
                         <option value="">اختر إجراء</option>
                         <option value="completed">مكتمل</option>
+                        <option value="workshop">سحب للورشة</option>
                         <option value="cancelled">ملغي</option>
                         <option value="postponed">تأجيل</option>
                     </select>
-                    <div class="action-options" id="action-options-${appointment.id}" style="display: none;">
-                        <!-- يتم ملء الخيارات الفرعية هنا ديناميكياً -->
-                    </div>
                 </td>
             </tr>
         `;
@@ -278,12 +318,10 @@ function displayAppointments(appointments) {
                     <select onchange="handleActionChange(this, ${appointment.id})">
                         <option value="">اختر إجراء</option>
                         <option value="completed">مكتمل</option>
+                        <option value="workshop">سحب للورشة</option>
                         <option value="cancelled">ملغي</option>
                         <option value="postponed">تأجيل</option>
                     </select>
-                    <div class="action-options" id="action-options-${appointment.id}" style="display: none;">
-                        <!-- يتم ملء الخيارات الفرعية هنا ديناميكياً -->
-                    </div>
                 </td>
             </tr>
         `;
@@ -307,12 +345,9 @@ function displayAppointments(appointments) {
                     <select onchange="handleActionChange(this, ${appointment.id})">
                         <option value="">اختر إجراء</option>
                         <option value="completed">مكتمل</option>
+                        <option value="workshop">سحب للورشة</option>
                         <option value="cancelled">ملغي</option>
-                        <option value="postponed">تأجيل</option>
                     </select>
-                    <div class="action-options" id="action-options-${appointment.id}" style="display: none;">
-                        <!-- يتم ملء الخيارات الفرعية هنا ديناميكياً -->
-                    </div>
                 </td>
             </tr>
         `;
@@ -334,28 +369,28 @@ function showUpcomingAppointments() {
   document.querySelector('.header').style.display = 'none';
   document.querySelector('.upcoming-btn').style.display = 'none';
   document.querySelector('.missed-section').style.display = 'none';
-    document.querySelector('.history-btn').style.display = 'none'; // إخفاء زر سجل المواعيد
+  document.querySelector('.history-btn').style.display = 'none'; // إخفاء زر سجل المواعيد
   document.querySelector('.appointments-section').style.display = 'none';
   document.querySelector('.pending-section').style.display = 'none';
   document.getElementById('add-appointment-section').style.display = 'none';
-    document.getElementById('history-section').style.display = 'none'; // إخفاء قسم سجل المواعيد
-	  document.querySelector('.button-container').style.display = 'none'; // إخفاء حاوية الأزرار
+  document.getElementById('history-section').style.display = 'none'; // إخفاء قسم سجل المواعيد
+  document.querySelector('.button-container').style.display = 'none'; // إخفاء حاوية الأزرار
   filterUpcomingAppointments();
-   if (checkInternetConnection()) {
-        document.getElementById('upcoming-section').style.display = 'block';
-        document.querySelector('.header').style.display = 'none';
-        document.querySelector('.upcoming-btn').style.display = 'none';
-        document.querySelector('.missed-section').style.display = 'none';
-        document.querySelector('.history-btn').style.display = 'none';
-        document.querySelector('.appointments-section').style.display = 'none';
-        document.querySelector('.pending-section').style.display = 'none';
-        document.getElementById('add-appointment-section').style.display = 'none';
-        document.getElementById('history-section').style.display = 'none';
-        document.querySelector('.button-container').style.display = 'none';
-        filterUpcomingAppointments();
-    } else {
-        showConnectionMessage();
-    }
+  if (checkInternetConnection()) {
+      document.getElementById('upcoming-section').style.display = 'block';
+      document.querySelector('.header').style.display = 'none';
+      document.querySelector('.upcoming-btn').style.display = 'none';
+      document.querySelector('.missed-section').style.display = 'none';
+      document.querySelector('.history-btn').style.display = 'none';
+      document.querySelector('.appointments-section').style.display = 'none';
+      document.querySelector('.pending-section').style.display = 'none';
+      document.getElementById('add-appointment-section').style.display = 'none';
+      document.getElementById('history-section').style.display = 'none';
+      document.querySelector('.button-container').style.display = 'none';
+      filterUpcomingAppointments();
+  } else {
+      showConnectionMessage();
+  }
 }
 
 // تحميل البيانات عند فتح الصفحة
@@ -369,10 +404,9 @@ function showMainContent() {
   document.querySelector('.missed-section').style.display = 'block';
   document.querySelector('.appointments-section').style.display = 'block';
   document.querySelector('.pending-section').style.display = 'block';
-    document.querySelector('.history-btn').style.display = 'block'; // إعادة عرض زر سجل المواعيد
-	  document.querySelector('.button-container').style.display = 'flex'; // إعادة عرض حاوية الأزرار
-    document.getElementById('history-section').style.display = 'none'; // إخفاء قسم سجل المواعيد
-
+  document.querySelector('.history-btn').style.display = 'block'; // إعادة عرض زر سجل المواعيد
+  document.querySelector('.button-container').style.display = 'flex'; // إعادة عرض حاوية الأزرار
+  document.getElementById('history-section').style.display = 'none'; // إخفاء قسم سجل المواعيد
 }
 
 // تغيير طريقة الفلترة
@@ -425,12 +459,9 @@ function filterUpcomingAppointments() {
             <select onchange="handleActionChange(this, ${appointment.id})">
               <option value="">اختر إجراء</option>
               <option value="completed">مكتمل</option>
+              <option value="workshop">سحب للورشة</option>
               <option value="cancelled">ملغي</option>
-              <option value="postponed">تأجيل</option>
             </select>
-            <div class="action-options" id="action-options-${appointment.id}" style="display: none;">
-              <!-- يتم ملء الخيارات الفرعية هنا ديناميكياً -->
-            </div>
           </td>
         </tr>
       `;
@@ -501,23 +532,23 @@ function showHistory() {
   document.querySelector('.pending-section').style.display = 'none';
   document.getElementById('upcoming-section').style.display = 'none';
   document.getElementById('add-appointment-section').style.display = 'none';
-  	  document.querySelector('.button-container').style.display = 'none'; // إخفاء حاوية الأزرار
+  document.querySelector('.button-container').style.display = 'none'; // إخفاء حاوية الأزرار
   filterHistoryAppointments(); // تحميل المواعيد مع الفلترة الافتراضية
-    if (checkInternetConnection()) {
-        document.getElementById('history-section').style.display = 'block';
-        document.querySelector('.header').style.display = 'none';
-        document.querySelector('.upcoming-btn').style.display = 'none';
-        document.querySelector('.history-btn').style.display = 'none';
-        document.querySelector('.missed-section').style.display = 'none';
-        document.querySelector('.appointments-section').style.display = 'none';
-        document.querySelector('.pending-section').style.display = 'none';
-        document.getElementById('upcoming-section').style.display = 'none';
-        document.getElementById('add-appointment-section').style.display = 'none';
-        document.querySelector('.button-container').style.display = 'none';
-        filterHistoryAppointments();
-    } else {
-        showConnectionMessage();
-    }
+  if (checkInternetConnection()) {
+      document.getElementById('history-section').style.display = 'block';
+      document.querySelector('.header').style.display = 'none';
+      document.querySelector('.upcoming-btn').style.display = 'none';
+      document.querySelector('.history-btn').style.display = 'none';
+      document.querySelector('.missed-section').style.display = 'none';
+      document.querySelector('.appointments-section').style.display = 'none';
+      document.querySelector('.pending-section').style.display = 'none';
+      document.getElementById('upcoming-section').style.display = 'none';
+      document.getElementById('add-appointment-section').style.display = 'none';
+      document.querySelector('.button-container').style.display = 'none';
+      filterHistoryAppointments();
+  } else {
+      showConnectionMessage();
+  }
 }
 
 // متغير لتتبع الصفحة الحالية
@@ -600,8 +631,117 @@ function checkInternetConnection() {
 }
 
 function showConnectionMessage() {	
-	  const connectionMessage = document.getElementById('connectionMessage');
+    const connectionMessage = document.getElementById('connectionMessage');
     if (connectionMessage) {
         connectionMessage.style.display = 'block';
+    }
+}
+
+let currentAppointmentId = null; // لتخزين الموعد الحالي الذي يتم التعامل معه
+
+// دالة لفتح النافذة المنبثقة
+function openModal(modalId, appointmentId) {
+  currentAppointmentId = appointmentId;
+  document.getElementById(modalId).style.display = 'block';
+}
+
+// دالة لإغلاق النافذة المنبثقة
+function closeModal(modalId) {
+  document.getElementById(modalId).style.display = 'none';
+}
+
+// دالة لإضافة قطعة غيار
+function addSparePart() {
+  const container = document.getElementById('sparePartsContainer');
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'sparePart';
+  input.placeholder = 'اسم قطعة الغيار';
+  container.appendChild(input);
+}
+
+// دالة لحفظ الموعد المكتمل
+function saveCompletedAppointment() {
+  const maintenanceDetails = document.getElementById('maintenanceDetails').value;
+  const price = document.getElementById('price').value;
+  const actualDateTime = document.getElementById('actualDateTime').value;
+  const spareParts = Array.from(document.querySelectorAll('.sparePart')).map(input => input.value);
+
+  const appointment = appointments.find(app => app.id === currentAppointmentId);
+  if (appointment) {
+    appointment.action = 'مكتمل';
+    appointment.maintenanceDetails = maintenanceDetails;
+    appointment.price = price;
+    appointment.actualDateTime = actualDateTime;
+    appointment.spareParts = spareParts;
+    moveToHistory(appointment.id, 'مكتمل');
+  }
+
+  closeModal('completeModal');
+}
+
+// دالة لحفظ الموعد المسحوب للورشة
+function saveWorkshopAppointment() {
+  const workshopNotes = document.getElementById('workshopNotes').value;
+
+  const appointment = appointments.find(app => app.id === currentAppointmentId);
+  if (appointment) {
+    appointment.action = 'سحب للورشة';
+    appointment.workshopNotes = workshopNotes;
+    moveToHistory(appointment.id, 'سحب للورشة');
+  }
+
+  closeModal('workshopModal');
+}
+
+// دالة لحفظ الموعد الملغي
+function saveCancelledAppointment() {
+  const cancelReason = document.getElementById('cancelReason').value;
+
+  const appointment = appointments.find(app => app.id === currentAppointmentId);
+  if (appointment) {
+    appointment.action = 'ملغي';
+    appointment.cancelReason = cancelReason;
+    moveToHistory(appointment.id, 'ملغي');
+  }
+
+  closeModal('cancelModal');
+}
+
+// دالة لحفظ الموعد المؤجل
+function savePostponedAppointment() {
+  const newAppointmentDate = document.getElementById('newAppointmentDate').value;
+  const newAppointmentTime = document.getElementById('newAppointmentTime').value;
+
+  const appointment = appointments.find(app => app.id === currentAppointmentId);
+  if (appointment) {
+    appointment.date = newAppointmentDate;
+    appointment.time = newAppointmentTime;
+    loadAppointments(); // إعادة تحميل المواعيد لتحديث الجدول
+  }
+
+  closeModal('postponeModal');
+}
+
+// تعديل الأزرار في الجداول
+function handleActionChange(selectElement, appointmentId) {
+  const action = selectElement.value;
+  if (action === "completed") {
+    openModal('completeModal', appointmentId);
+  } else if (action === "workshop") {
+    openModal('workshopModal', appointmentId);
+  } else if (action === "cancelled") {
+    openModal('cancelModal', appointmentId);
+  } else if (action === "postponed") {
+    openModal('postponeModal', appointmentId);
+  }
+}
+
+// دالة لفتح تطبيق الاتصال بالهاتف
+function makeCall(phoneNumber) {
+    if (phoneNumber) {
+        window.open(`tel:${phoneNumber}`); // فتح تطبيق الاتصال بالهاتف
+    } else {
+        alert("رقم الهاتف غير متوفر.");
     }
 }

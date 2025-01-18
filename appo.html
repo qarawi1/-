@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>إدارة المواعيد</title>
   <link rel="stylesheet" href="appo.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <!-- العنوان -->
@@ -13,12 +13,11 @@
     <h1>مواعيد اليوم - <span id="current-date"></span></h1>
   </header>
   
-  
   <!-- حاوية الأزرار العلوية -->
-<div class="button-container">
-  <button class="upcoming-btn" onclick="showUpcomingAppointments()">المواعيد القادمة</button>
-  <button class="history-btn" onclick="showHistory()">سجل المواعيد</button>
-</div>
+  <div class="button-container">
+    <button class="upcoming-btn" onclick="showUpcomingAppointments()">المواعيد القادمة</button>
+    <button class="history-btn" onclick="showHistory()">سجل المواعيد</button>
+  </div>
 
   <!-- واجهة إضافة موعد جديد -->
   <section id="add-appointment-section" class="add-appointment-section" style="display: none;">
@@ -115,31 +114,31 @@
     </table>
   </section>
 
-<!-- جدول المواعيد القادمة -->
-<section id="upcoming-section" class="upcoming-section" style="display: none;">
-  <!-- شريط علوي -->
-  <div class="upcoming-header">
-    <button class="back-btn" onclick="showMainContent()">العودة</button>
-    <select id="filter-method" onchange="changeFilterMethod()">
-      <option value="date">فلترة بالتاريخ والوقت</option>
-      <option value="name">فلترة بالاسم أو الرقم</option>
-    </select>
-  </div>
-
-  <!-- فلترة بالتاريخ والوقت -->
-  <div id="date-filter" class="filter-section">
-    <label for="filter-date">اختر التاريخ:</label>
-    <input type="date" id="filter-date" onchange="filterUpcomingAppointments()">
-  </div>
-
-  <!-- فلترة بالاسم أو الرقم -->
-  <div id="name-filter" class="filter-section" style="display: none;">
-    <label for="search-input">ابحث بالاسم أو الرقم:</label>
-    <input type="text" id="search-input" placeholder="ادخل الاسم أو الرقم" oninput="filterUpcomingAppointments()">
-  </div>
-
   <!-- جدول المواعيد القادمة -->
-  <table id="upcoming-appointments" class="appointments-table">
+  <section id="upcoming-section" class="upcoming-section" style="display: none;">
+    <!-- شريط علوي -->
+    <div class="upcoming-header">
+      <button class="back-btn" onclick="showMainContent()">العودة</button>
+      <select id="filter-method" onchange="changeFilterMethod()">
+        <option value="date">فلترة بالتاريخ والوقت</option>
+        <option value="name">فلترة بالاسم أو الرقم</option>
+      </select>
+    </div>
+
+    <!-- فلترة بالتاريخ والوقت -->
+    <div id="date-filter" class="filter-section">
+      <label for="filter-date">اختر التاريخ:</label>
+      <input type="date" id="filter-date" onchange="filterUpcomingAppointments()">
+    </div>
+
+    <!-- فلترة بالاسم أو الرقم -->
+    <div id="name-filter" class="filter-section" style="display: none;">
+      <label for="search-input">ابحث بالاسم أو الرقم:</label>
+      <input type="text" id="search-input" placeholder="ادخل الاسم أو الرقم" oninput="filterUpcomingAppointments()">
+    </div>
+
+    <!-- جدول المواعيد القادمة -->
+    <table id="upcoming-appointments" class="appointments-table">
       <h2>المواعيد القادمة</h2>
       <thead>
         <tr>
@@ -191,59 +190,137 @@
   <!-- أيقونة إضافة موعد -->
   <button class="floating-btn" onclick="showAddAppointment()">+</button>
 
-<!-- جدول سجل المواعيد -->
-<section id="history-section" class="history-section" style="display: none;">
-  
+  <!-- جدول سجل المواعيد -->
+  <section id="history-section" class="history-section" style="display: none;">
     <!-- شريط علوي -->
-  <div class="history-header">
-    <button class="back-btn" onclick="showMainContent()">العودة</button>
-    <select id="history-filter-method" onchange="changeHistoryFilterMethod()">
-      <option value="date">فرز بالتاريخ والوقت</option>
-      <option value="name">فرز بالاسم ورقم الهاتف</option>
-    </select>
+    <div class="history-header">
+      <button class="back-btn" onclick="showMainContent()">العودة</button>
+      <select id="history-filter-method" onchange="changeHistoryFilterMethod()">
+        <option value="date">فرز بالتاريخ والوقت</option>
+        <option value="name">فرز بالاسم ورقم الهاتف</option>
+      </select>
+    </div>
+
+    <!-- فلترة بالتاريخ والوقت -->
+    <div id="history-date-filter" class="filter-section">
+      <label for="history-filter-date">اختر التاريخ:</label>
+      <input type="date" id="history-filter-date" onchange="filterHistoryAppointments()">
+    </div>
+
+    <!-- فلترة بالاسم ورقم الهاتف -->
+    <div id="history-name-filter" class="filter-section" style="display: none;">
+      <label for="history-search-input">ابحث بالاسم أو رقم الهاتف:</label>
+      <input type="text" id="history-search-input" placeholder="ادخل الاسم أو رقم الهاتف" oninput="filterHistoryAppointments()">
+    </div>
+
+
+<!-- نافذة منبثقة لعرض تفاصيل الموعد -->
+<div id="appointmentDetailsModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('appointmentDetailsModal')">&times;</span>
+    <h2>تفاصيل الموعد</h2>
+    <div id="appointmentDetailsContent">
+      <!-- سيتم ملء المحتوى هنا ديناميكياً -->
+    </div>
+    <button onclick="closeModal('appointmentDetailsModal')">إغلاق</button>
   </div>
-
-  <!-- فلترة بالتاريخ والوقت -->
-  <div id="history-date-filter" class="filter-section">
-    <label for="history-filter-date">اختر التاريخ:</label>
-    <input type="date" id="history-filter-date" onchange="filterHistoryAppointments()">
-  </div>
-
-  <!-- فلترة بالاسم ورقم الهاتف -->
-  <div id="history-name-filter" class="filter-section" style="display: none;">
-    <label for="history-search-input">ابحث بالاسم أو رقم الهاتف:</label>
-    <input type="text" id="history-search-input" placeholder="ادخل الاسم أو رقم الهاتف" oninput="filterHistoryAppointments()">
-  </div>
-
-
-  <h2>سجل المواعيد</h2>
-  <table id="history-appointments" class="appointments-table">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>رقم الموعد</th>
-        <th>اسم العميل</th>
-        <th>وقت الموعد</th>
-        <th>التاريخ</th>
-        <th>رقم الهاتف</th>
-        <th>رقم هاتف آخر</th>
-        <th>العنوان</th>
-        <th>المشكلة</th>
-        <th>نوع الجهاز</th>
-        <th>اسم الجهاز</th>
-        <th>ملاحظات</th>
-        <th>الإجراء</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- يتم ملء البيانات ديناميكياً -->
-    </tbody>
-  </table>
-</section>
-
-<div id="connectionMessage" style="display: none; text-align: center; color: red; font-weight: bold;">
-    هذا القسم يحتاج إلى اتصال بالإنترنت.
 </div>
+
+    <h2>سجل المواعيد</h2>
+    <table id="history-appointments" class="appointments-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>رقم الموعد</th>
+          <th>اسم العميل</th>
+          <th>وقت الموعد</th>
+          <th>التاريخ</th>
+          <th>رقم الهاتف</th>
+          <th>رقم هاتف آخر</th>
+          <th>العنوان</th>
+          <th>المشكلة</th>
+          <th>نوع الجهاز</th>
+          <th>اسم الجهاز</th>
+          <th>ملاحظات</th>
+          <th>الإجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- يتم ملء البيانات ديناميكياً -->
+      </tbody>
+    </table>
+  </section>
+  
+  <div id="connectionMessage" style="display: none; text-align: center; color: red; font-weight: bold;">
+    هذا القسم يحتاج إلى اتصال بالإنترنت.
+  </div>
+
+  <!-- نافذة منبثقة لإكمال الموعد -->
+  <div id="completeModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('completeModal')">&times;</span>
+      <h2>إكمال الموعد</h2>
+      <label for="maintenanceDetails">تفاصيل الصيانة:</label>
+      <textarea id="maintenanceDetails" required></textarea>
+      
+      <label for="price">السعر:</label>
+      <input type="number" id="price" required>
+      
+      <label for="actualDateTime">الوقت والتاريخ الفعلي:</label>
+      <input type="datetime-local" id="actualDateTime" required>
+      
+      <label for="spareParts">قطع الغيار:</label>
+      <div id="sparePartsContainer">
+        <input type="text" class="sparePart" placeholder="اسم قطعة الغيار">
+      </div>
+      <button onclick="addSparePart()">إضافة قطعة غيار</button>
+      
+      <button onclick="saveCompletedAppointment()">حفظ</button>
+      <button onclick="closeModal('completeModal')">إلغاء</button>
+    </div>
+  </div>
+
+  <!-- نافذة منبثقة لسحب الموعد للورشة -->
+  <div id="workshopModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('workshopModal')">&times;</span>
+      <h2>سحب للورشة</h2>
+      <label for="workshopNotes">ملاحظات:</label>
+      <textarea id="workshopNotes" required></textarea>
+      
+      <button onclick="saveWorkshopAppointment()">حفظ</button>
+      <button onclick="closeModal('workshopModal')">إلغاء</button>
+    </div>
+  </div>
+
+  <!-- نافذة منبثقة لإلغاء الموعد -->
+  <div id="cancelModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('cancelModal')">&times;</span>
+      <h2>إلغاء الموعد</h2>
+      <label for="cancelReason">سبب الإلغاء:</label>
+      <textarea id="cancelReason" required></textarea>
+      
+      <button onclick="saveCancelledAppointment()">حفظ</button>
+      <button onclick="closeModal('cancelModal')">إلغاء</button>
+    </div>
+  </div>
+
+  <!-- نافذة منبثقة لتأجيل الموعد -->
+  <div id="postponeModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('postponeModal')">&times;</span>
+      <h2>تأجيل الموعد</h2>
+      <label for="newAppointmentDate">تاريخ الموعد الجديد:</label>
+      <input type="date" id="newAppointmentDate" required>
+      
+      <label for="newAppointmentTime">وقت الموعد الجديد:</label>
+      <input type="time" id="newAppointmentTime" required>
+      
+      <button onclick="savePostponedAppointment()">حفظ</button>
+      <button onclick="closeModal('postponeModal')">إلغاء</button>
+    </div>
+  </div>
 
   <script src="appo.js"></script>
 </body>
