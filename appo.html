@@ -23,6 +23,16 @@
   <section id="add-appointment-section" class="add-appointment-section" style="display: none;">
     <h2>إضافة موعد جديد</h2>
     <form id="add-appointment-form">
+	
+<label for="phone">رقم الهاتف:</label>
+    <input type="text" id="phone" required>
+    <button type="button" onclick="selectFromContacts()">اختر من جهات الاتصال</button>
+    <button type="button" onclick="selectFromTruecaller()">اختر من Truecaller</button>
+    
+	
+    <label for="alt-phone">رقم هاتف آخر:</label>
+    <input type="text" id="alt-phone">
+	
       <label for="appointment-number">رقم الموعد:</label>
       <input type="text" id="appointment-number" required>
       
@@ -34,12 +44,6 @@
       
       <label for="appointment-date">تاريخ الموعد:</label>
       <input type="date" id="appointment-date" required>
-      
-      <label for="phone">رقم الهاتف:</label>
-      <input type="text" id="phone" required>
-      
-      <label for="alt-phone">رقم هاتف آخر:</label>
-      <input type="text" id="alt-phone">
       
       <label for="address">العنوان:</label>
       <input type="text" id="address" required>
@@ -213,19 +217,6 @@
       <input type="text" id="history-search-input" placeholder="ادخل الاسم أو رقم الهاتف" oninput="filterHistoryAppointments()">
     </div>
 
-
-<!-- نافذة منبثقة لعرض تفاصيل الموعد -->
-<div id="appointmentDetailsModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal('appointmentDetailsModal')">&times;</span>
-    <h2>تفاصيل الموعد</h2>
-    <div id="appointmentDetailsContent">
-      <!-- سيتم ملء المحتوى هنا ديناميكياً -->
-    </div>
-    <button onclick="closeModal('appointmentDetailsModal')">إغلاق</button>
-  </div>
-</div>
-
     <h2>سجل المواعيد</h2>
     <table id="history-appointments" class="appointments-table">
       <thead>
@@ -321,6 +312,19 @@
       <button onclick="closeModal('postponeModal')">إلغاء</button>
     </div>
   </div>
+  
+
+<!-- نافذة منبثقة لعرض تفاصيل الموعد -->
+<div id="appointmentDetailsModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal('appointmentDetailsModal')">&times;</span>
+    <h2>تفاصيل الموعد</h2>
+    <div id="appointmentDetailsContent">
+      <!-- سيتم ملء المحتوى هنا ديناميكياً -->
+    </div>
+    <button onclick="closeModal('appointmentDetailsModal')">إغلاق</button>
+  </div>
+</div>
 
   <script src="appo.js"></script>
 </body>

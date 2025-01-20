@@ -739,3 +739,49 @@ function makeCall(phoneNumber) {
         alert("رقم الهاتف غير متوفر.");
     }
 }
+
+// دالة لاختيار رقم الهاتف من جهات الاتصال
+function selectFromContacts() {
+  if ('contacts' in navigator && 'ContactsManager' in window) {
+    const props = ['name', 'tel'];
+    const opts = { multiple: false };
+
+    navigator.contacts.select(props, opts)
+      .then(contacts => {
+        if (contacts.length > 0) {
+          const contact = contacts[0];
+          document.getElementById('phone').value = contact.tel[0];
+          document.getElementById('client-name').value = contact.name[0];
+          autoFillFieldsIfNumberExists(); // ملء الحقول إذا كان الرقم موجودًا مسبقًا
+        }
+      })
+      .catch(err => {
+        console.error('حدث خطأ أثناء جلب جهات الاتصال:', err);
+      });
+  } else {
+    alert('جهات الاتصال غير مدعومة في هذا المتصفح.');
+  }
+}
+
+// دالة لاختيار رقم الهاتف من Truecaller (تتطلب تكامل مع API)
+function selectFromTruecaller() {
+  alert('هذه الميزة تتطلب تكامل مع Truecaller API.');
+}
+
+// دالة لملء الحقول تلقائيًا إذا كان الرقم موجودًا مسبقًا
+function autoFillFieldsIfNumberExists() {
+  const phone = document.getElementById('phone').value;
+  const existingAppointment = appointments.find(app => app.phone === phone);
+
+  if (existingAppointment) {
+    document.getElementById('client-name').value = existingAppointment.clientName;
+    document.getElementById('address').value = existingAppointment.address;
+    document.getElementById('issue').value = existingAppointment.issue;
+    document.getElementById('device-type').value = existingAppointment.deviceType;
+    document.getElementById('device-name').value = existingAppointment.deviceName;
+    // لا نملأ الملاحظات
+  }
+}
+
+// استدعاء الدالة عند تغيير رقم الهاتف
+document.getElementById('phone').addEventListener('input', autoFillFieldsIfNumberExists);
