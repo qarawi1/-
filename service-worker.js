@@ -1,4 +1,4 @@
-const CACHE_NAME = 'app-cache-v3';
+const CACHE_NAME = 'app-cache-v4';
 const OFFLINE_URL = '/offline.html'; // الصفحة التي تريد عرضها عند عدم وجود اتصال
 
 const OFFLINE_URLS = [
