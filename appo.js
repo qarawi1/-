@@ -80,7 +80,6 @@ function loadHistoryAppointments() {
     historyTableBody.innerHTML += `
       <tr onclick="showAppointmentDetails(${appointment.id})">
         <td>${index + 1}</td>
-        <td>${appointment.appointmentNumber}</td>
         <td>${appointment.clientName}</td>
         <td>${appointment.time}</td>
         <td>${appointment.date}</td>
@@ -108,6 +107,7 @@ function showAppointmentDetails(appointmentId) {
       <p><strong>نوع الجهاز:</strong> ${appointment.deviceType}</p>
       <p><strong>ملاحظات:</strong> ${appointment.notes}</p>
       <p><strong>الإجراء المتخذ:</strong> ${appointment.action}</p>
+	        <p><strong>أضيف بواسطة:</strong> ${appointment.addedBy}</p> <!-- اسم المستخدم -->
     `;
 
     // إضافة تفاصيل إضافية بناءً على الإجراء المتخذ
@@ -174,7 +174,6 @@ function cancelAddAppointment() {
 
 // حفظ الموعد الجديد
 function saveAppointment() {
-  const appointmentNumber = document.getElementById('appointment-number').value;
   const clientName = document.getElementById('client-name').value;
   const appointmentTime = document.getElementById('appointment-time').value;
   const appointmentDate = document.getElementById('appointment-date').value;
@@ -188,7 +187,6 @@ function saveAppointment() {
 
   const newAppointment = {
     id: Date.now(),
-    appointmentNumber,
     clientName,
     time: appointmentTime,
     date: appointmentDate,
@@ -199,8 +197,10 @@ function saveAppointment() {
     deviceType,
     deviceName,
     notes,
-    status: "قيد الانتظار"
+    status: "قيد الانتظار",
+addedBy: currentUser.name // إذا كان لديك متغير `currentUser` يحتوي على معلومات المستخدم
   };
+
 
   // التحقق من تاريخ الموعد
   const currentDate = new Date();
@@ -270,7 +270,6 @@ function displayAppointments(appointments) {
         const todayRow = `
             <tr>
                 <td>${index + 1}</td>
-                <td>${appointment.appointmentNumber}</td>
                 <td>${appointment.clientName}</td>
                 <td>${appointment.time}</td>
                 <td><button onclick="makeCall('${appointment.phone}')">${appointment.phone}</button></td>
@@ -296,7 +295,6 @@ function displayAppointments(appointments) {
         const missedRow = `
             <tr>
                 <td>${index + 1}</td>
-                <td>${appointment.appointmentNumber}</td>
                 <td>${appointment.clientName}</td>
                 <td>${appointment.time}</td>
                 <td>${appointment.date}</td>
@@ -323,7 +321,6 @@ function displayAppointments(appointments) {
         const upcomingRow = `
             <tr>
                 <td>${index + 1}</td>
-                <td>${appointment.appointmentNumber}</td>
                 <td>${appointment.clientName}</td>
                 <td>${appointment.time}</td>
                 <td>${appointment.date}</td>
@@ -431,13 +428,12 @@ function filterUpcomingAppointments() {
     const appointmentDateTime = new Date(`${appointment.date}T${appointment.time}`);
     const matchesFilter = filterMethod === 'date'
       ? (!filterDate || appointment.date === filterDate)
-      : (appointment.clientName.toLowerCase().includes(searchInput) || appointment.appointmentNumber.includes(searchInput));
+      : (appointment.clientName.toLowerCase().includes(searchInput) || appointment.includes(searchInput));
 
     if (appointmentDateTime > new Date() && matchesFilter) {
       upcomingTableBody.innerHTML += `
         <tr>
           <td>${index + 1}</td>
-          <td>${appointment.appointmentNumber}</td>
           <td>${appointment.clientName}</td>
           <td>${appointment.time}</td>
           <td>${appointment.date}</td>
@@ -496,7 +492,6 @@ function filterHistoryAppointments() {
 historyTableBody.innerHTML += `
   <tr onclick="showAppointmentDetails(${appointment.id})">
     <td>${index + 1}</td>
-    <td>${appointment.appointmentNumber}</td>
     <td>${appointment.clientName}</td>
     <td>${appointment.time}</td>
     <td>${appointment.date}</td>
@@ -740,48 +735,42 @@ function makeCall(phoneNumber) {
     }
 }
 
-// دالة لاختيار رقم الهاتف من جهات الاتصال
-function selectFromContacts() {
-  if ('contacts' in navigator && 'ContactsManager' in window) {
-    const props = ['name', 'tel'];
-    const opts = { multiple: false };
+// مستمع لحدث input على حقل رقم الهاتف
+document.getElementById('phone').addEventListener('input', function() {
+  const phoneNumber = this.value.trim(); // الحصول على رقم الهاتف المدخل
+  const appointments = JSON.parse(localStorage.getItem('appointments')) || []; // تحميل المواعيد الحالية
+  const historyAppointments = JSON.parse(localStorage.getItem('historyAppointments')) || []; // تحميل سجل المواعيد
 
-    navigator.contacts.select(props, opts)
-      .then(contacts => {
-        if (contacts.length > 0) {
-          const contact = contacts[0];
-          document.getElementById('phone').value = contact.tel[0];
-          document.getElementById('client-name').value = contact.name[0];
-          autoFillFieldsIfNumberExists(); // ملء الحقول إذا كان الرقم موجودًا مسبقًا
-        }
-      })
-      .catch(err => {
-        console.error('حدث خطأ أثناء جلب جهات الاتصال:', err);
-      });
-  } else {
-    alert('جهات الاتصال غير مدعومة في هذا المتصفح.');
+  // البحث عن موعد سابق بنفس رقم الهاتف في المواعيد الحالية
+  let previousAppointment = appointments.find(app => app.phone === phoneNumber);
+
+  // إذا لم يتم العثور على الموعد في المواعيد الحالية، نبحث في سجل المواعيد
+  if (!previousAppointment) {
+    previousAppointment = historyAppointments.find(app => app.phone === phoneNumber);
   }
-}
 
-// دالة لاختيار رقم الهاتف من Truecaller (تتطلب تكامل مع API)
-function selectFromTruecaller() {
-  alert('هذه الميزة تتطلب تكامل مع Truecaller API.');
-}
+  if (previousAppointment) {
+    // إذا تم العثور على موعد سابق، يتم ملء الحقول تلقائيًا فقط إذا كانت فارغة
+    if (!document.getElementById('client-name').value) {
+      document.getElementById('client-name').value = previousAppointment.clientName;
+    }
+    if (!document.getElementById('alt-phone').value) {
+      document.getElementById('alt-phone').value = previousAppointment.altPhone;
+    }
+    if (!document.getElementById('address').value) {
+      document.getElementById('address').value = previousAppointment.address;
+    }
+    if (!document.getElementById('issue').value) {
+      document.getElementById('issue').value = previousAppointment.issue;
+    }
+    if (!document.getElementById('device-type').value) {
+      document.getElementById('device-type').value = previousAppointment.deviceType;
+    }
+    if (!document.getElementById('device-name').value) {
+      document.getElementById('device-name').value = previousAppointment.deviceName;
+    }
 
-// دالة لملء الحقول تلقائيًا إذا كان الرقم موجودًا مسبقًا
-function autoFillFieldsIfNumberExists() {
-  const phone = document.getElementById('phone').value;
-  const existingAppointment = appointments.find(app => app.phone === phone);
-
-  if (existingAppointment) {
-    document.getElementById('client-name').value = existingAppointment.clientName;
-    document.getElementById('address').value = existingAppointment.address;
-    document.getElementById('issue').value = existingAppointment.issue;
-    document.getElementById('device-type').value = existingAppointment.deviceType;
-    document.getElementById('device-name').value = existingAppointment.deviceName;
-    // لا نملأ الملاحظات
+    // الملاحظات لا يتم ملؤها تلقائيًا أبدًا
+    document.getElementById('notes').value = '';
   }
-}
-
-// استدعاء الدالة عند تغيير رقم الهاتف
-document.getElementById('phone').addEventListener('input', autoFillFieldsIfNumberExists);
+});
