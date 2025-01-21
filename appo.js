@@ -158,6 +158,7 @@ function showAddAppointment() {
   document.querySelector('.history-btn').style.display = 'none'; // إخفاء زر سجل المواعيد
   document.querySelector('.button-container').style.display = 'none'; // إخفاء حاوية الأزرار
   document.getElementById('history-section').style.display = 'none'; // إخفاء قسم سجل المواعيد
+    document.querySelector('.floating-btn').style.display = 'none';
 }
 
 // إخفاء واجهة إضافة موعد جديد
@@ -170,6 +171,7 @@ function cancelAddAppointment() {
   document.querySelector('.pending-section').style.display = 'block';
   document.querySelector('.history-btn').style.display = 'block'; // إعادة عرض زر سجل المواعيد
   document.querySelector('.button-container').style.display = 'flex'; // إعادة عرض حاوية الأزرار
+    document.querySelector('.floating-btn').style.display = 'block';
 }
 
 // تعريف المستخدم الحالي (يمكن جلب هذه البيانات من نظام تسجيل الدخول)
