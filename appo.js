@@ -172,6 +172,15 @@ function cancelAddAppointment() {
   document.querySelector('.button-container').style.display = 'flex'; // إعادة عرض حاوية الأزرار
 }
 
+// تعريف المستخدم الحالي (يمكن جلب هذه البيانات من نظام تسجيل الدخول)
+const currentUser = {
+  name: "اسم المستخدم", // يمكن استبدال هذه القيمة بقيمة ديناميكية
+  id: 1 // يمكن إضافة المزيد من الخصائص حسب الحاجة
+};
+
+// ثم استخدامه في دالة saveAppointment
+addedBy: currentUser.name
+
 // حفظ الموعد الجديد
 function saveAppointment() {
   const clientName = document.getElementById('client-name').value;
