@@ -195,12 +195,13 @@ function saveAppointment() {
   const deviceType = document.getElementById('device-type').value;
   const deviceName = document.getElementById('device-name').value;
   const notes = document.getElementById('notes').value;
+  const noDateCheckbox = document.getElementById('no-date-checkbox').checked;
 
   const newAppointment = {
     id: Date.now(),
     clientName,
-    time: appointmentTime,
-    date: appointmentDate,
+    time: noDateCheckbox ? null : appointmentTime,
+    date: noDateCheckbox ? null : appointmentDate,
     phone,
     altPhone,
     address,
@@ -208,17 +209,19 @@ function saveAppointment() {
     deviceType,
     deviceName,
     notes,
-    status: "قيد الانتظار",
-addedBy: currentUser.name // إذا كان لديك متغير `currentUser` يحتوي على معلومات المستخدم
+    status: noDateCheckbox ? "بانتظار تحديد موعد" : "قيد الانتظار",
+    addedBy: currentUser.name
   };
 
 
-  // التحقق من تاريخ الموعد
-  const currentDate = new Date();
-  const appointmentDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
-  if (appointmentDateTime < currentDate) {
-    alert("التاريخ قديم! يرجى تعديل التاريخ أو الوقت.");
-    return;
+// التحقق من تاريخ الموعد (فقط إذا كان هناك تاريخ)
+  if (!noDateCheckbox) {
+    const currentDate = new Date();
+    const appointmentDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
+    if (appointmentDateTime < currentDate) {
+      alert("التاريخ قديم! يرجى تعديل التاريخ أو الوقت.");
+      return;
+    }
   }
 
   // إضافة الموعد إلى القائمة
@@ -231,6 +234,12 @@ addedBy: currentUser.name // إذا كان لديك متغير `currentUser` ي�
   // إعادة تحميل الجداول
   loadAppointments();
   cancelAddAppointment();
+  
+  
+console.log(noDateCheckbox);
+
+console.log(appointments); // قم بطباعة المواعيد بعد الحفظ للتأكد
+
 }
 
 // نقل المواعيد من "المواعيد القادمة" إلى "مواعيد اليوم" عند حلول تاريخها
@@ -265,101 +274,124 @@ function fetchAppointmentsFromServer() {
 }
 
 function displayAppointments(appointments) {
-    // عرض البيانات في الجداول
     const todayTableBody = document.querySelector('#today-appointments tbody');
     const missedTableBody = document.querySelector('#missed-appointments tbody');
     const upcomingTableBody = document.querySelector('#upcoming-appointments tbody');
+    const pendingTableBody = document.querySelector('#pending-users tbody'); // تعريف pendingTableBody
 
+    // تفريغ الجداول
     todayTableBody.innerHTML = "";
     missedTableBody.innerHTML = "";
     upcomingTableBody.innerHTML = "";
+    pendingTableBody.innerHTML = ""; // تفريغ جدول "مستخدمين بانتظار تحديد موعد"
 
     appointments.forEach((appointment, index) => {
-        const appointmentDateTime = new Date(`${appointment.date}T${appointment.time}`);
-        
-        // صف لجدول مواعيد اليوم (بدون حقل التاريخ)
-        const todayRow = `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${appointment.clientName}</td>
-                <td>${appointment.time}</td>
-                <td><button onclick="makeCall('${appointment.phone}')">${appointment.phone}</button></td>
-                <td><button onclick="makeCall('${appointment.altPhone}')">${appointment.altPhone}</button></td>
-                <td>${appointment.address}</td>
-                <td>${appointment.issue}</td>
-                <td>${appointment.deviceType}</td>
-                <td>${appointment.deviceName}</td>
-                <td>${appointment.notes}</td>
-                <td>
-                    <select onchange="handleActionChange(this, ${appointment.id})">
-                        <option value="">اختر إجراء</option>
-                        <option value="completed">مكتمل</option>
-                        <option value="workshop">سحب للورشة</option>
-                        <option value="cancelled">ملغي</option>
-                        <option value="postponed">تأجيل</option>
-                    </select>
-                </td>
-            </tr>
-        `;
+        const appointmentDateTime = appointment.date ? new Date(`${appointment.date}T${appointment.time}`) : null;
 
-        // صف لجدول المواعيد الفائتة (مع حقل التاريخ)
-        const missedRow = `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${appointment.clientName}</td>
-                <td>${appointment.time}</td>
-                <td>${appointment.date}</td>
-                <td><button onclick="makeCall('${appointment.phone}')">${appointment.phone}</button></td>
-                <td><button onclick="makeCall('${appointment.altPhone}')">${appointment.altPhone}</button></td>
-                <td>${appointment.address}</td>
-                <td>${appointment.issue}</td>
-                <td>${appointment.deviceType}</td>
-                <td>${appointment.deviceName}</td>
-                <td>${appointment.notes}</td>
-                <td>
-                    <select onchange="handleActionChange(this, ${appointment.id})">
-                        <option value="">اختر إجراء</option>
-                        <option value="completed">مكتمل</option>
-                        <option value="workshop">سحب للورشة</option>
-                        <option value="cancelled">ملغي</option>
-                        <option value="postponed">تأجيل</option>
-                    </select>
-                </td>
-            </tr>
-        `;
-
-        // صف لجدول المواعيد القادمة (مع حقل التاريخ)
-        const upcomingRow = `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${appointment.clientName}</td>
-                <td>${appointment.time}</td>
-                <td>${appointment.date}</td>
-                <td><button onclick="makeCall('${appointment.phone}')">${appointment.phone}</button></td>
-                <td><button onclick="makeCall('${appointment.altPhone}')">${appointment.altPhone}</button></td>
-                <td>${appointment.address}</td>
-                <td>${appointment.issue}</td>
-                <td>${appointment.deviceType}</td>
-                <td>${appointment.deviceName}</td>
-                <td>${appointment.notes}</td>
-                <td>
-                    <select onchange="handleActionChange(this, ${appointment.id})">
-                        <option value="">اختر إجراء</option>
-                        <option value="completed">مكتمل</option>
-                        <option value="workshop">سحب للورشة</option>
-                        <option value="cancelled">ملغي</option>
-                    </select>
-                </td>
-            </tr>
-        `;
-
-        // تحديد الجدول المناسب بناءً على تاريخ الموعد
-        if (appointmentDateTime.toDateString() === new Date().toDateString()) {
-            todayTableBody.innerHTML += todayRow; // جدول مواعيد اليوم (بدون تاريخ)
-        } else if (appointmentDateTime < new Date()) {
-            missedTableBody.innerHTML += missedRow; // جدول المواعيد الفائتة (مع تاريخ)
-        } else {
-            upcomingTableBody.innerHTML += upcomingRow; // جدول المواعيد القادمة (مع تاريخ)
+        if (appointment.status === "بانتظار تحديد موعد") {
+            // صف لجدول "مستخدمين بانتظار تحديد موعد"
+            const pendingRow = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${appointment.clientName}</td>
+                    <td>${appointment.phone}</td>
+                    <td>${appointment.altPhone}</td>
+                    <td>${appointment.address}</td>
+                    <td>${appointment.issue}</td>
+                    <td>${appointment.deviceType}</td>
+                    <td>${appointment.deviceName}</td>
+                    <td>${appointment.notes}</td>
+                    <td>
+                        <select onchange="handleActionChange(this, ${appointment.id})">
+                            <option value="">اختر إجراء</option>
+                            <option value="completed">مكتمل</option>
+                            <option value="workshop">سحب للورشة</option>
+                            <option value="cancelled">ملغي</option>
+                            <option value="postponed">تأجيل</option>
+                        </select>
+                    </td>
+                </tr>
+            `;
+            pendingTableBody.innerHTML += pendingRow;
+        } else if (appointmentDateTime && appointmentDateTime.toDateString() === new Date().toDateString()) {
+            // صف لجدول مواعيد اليوم (بدون حقل التاريخ)
+            const todayRow = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${appointment.clientName}</td>
+                    <td>${appointment.time}</td>
+                    <td><button onclick="makeCall('${appointment.phone}')">${appointment.phone}</button></td>
+                    <td><button onclick="makeCall('${appointment.altPhone}')">${appointment.altPhone}</button></td>
+                    <td>${appointment.address}</td>
+                    <td>${appointment.issue}</td>
+                    <td>${appointment.deviceType}</td>
+                    <td>${appointment.deviceName}</td>
+                    <td>${appointment.notes}</td>
+                    <td>
+                        <select onchange="handleActionChange(this, ${appointment.id})">
+                            <option value="">اختر إجراء</option>
+                            <option value="completed">مكتمل</option>
+                            <option value="workshop">سحب للورشة</option>
+                            <option value="cancelled">ملغي</option>
+                            <option value="postponed">تأجيل</option>
+                        </select>
+                    </td>
+                </tr>
+            `;
+            todayTableBody.innerHTML += todayRow;
+        } else if (appointmentDateTime && appointmentDateTime < new Date()) {
+            // صف لجدول المواعيد الفائتة (مع حقل التاريخ)
+            const missedRow = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${appointment.clientName}</td>
+                    <td>${appointment.time}</td>
+                    <td>${appointment.date}</td>
+                    <td><button onclick="makeCall('${appointment.phone}')">${appointment.phone}</button></td>
+                    <td><button onclick="makeCall('${appointment.altPhone}')">${appointment.altPhone}</button></td>
+                    <td>${appointment.address}</td>
+                    <td>${appointment.issue}</td>
+                    <td>${appointment.deviceType}</td>
+                    <td>${appointment.deviceName}</td>
+                    <td>${appointment.notes}</td>
+                    <td>
+                        <select onchange="handleActionChange(this, ${appointment.id})">
+                            <option value="">اختر إجراء</option>
+                            <option value="completed">مكتمل</option>
+                            <option value="workshop">سحب للورشة</option>
+                            <option value="cancelled">ملغي</option>
+                            <option value="postponed">تأجيل</option>
+                        </select>
+                    </td>
+                </tr>
+            `;
+            missedTableBody.innerHTML += missedRow;
+        } else if (appointmentDateTime && appointmentDateTime > new Date()) {
+            // صف لجدول المواعيد القادمة (مع حقل التاريخ)
+            const upcomingRow = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${appointment.clientName}</td>
+                    <td>${appointment.time}</td>
+                    <td>${appointment.date}</td>
+                    <td><button onclick="makeCall('${appointment.phone}')">${appointment.phone}</button></td>
+                    <td><button onclick="makeCall('${appointment.altPhone}')">${appointment.altPhone}</button></td>
+                    <td>${appointment.address}</td>
+                    <td>${appointment.issue}</td>
+                    <td>${appointment.deviceType}</td>
+                    <td>${appointment.deviceName}</td>
+                    <td>${appointment.notes}</td>
+                    <td>
+                        <select onchange="handleActionChange(this, ${appointment.id})">
+                            <option value="">اختر إجراء</option>
+                            <option value="completed">مكتمل</option>
+                            <option value="workshop">سحب للورشة</option>
+                            <option value="cancelled">ملغي</option>
+                        </select>
+                    </td>
+                </tr>
+            `;
+            upcomingTableBody.innerHTML += upcomingRow;
         }
     });
 }
@@ -622,6 +654,7 @@ function showAddAppointment() {
   document.querySelector('.pending-section').style.display = 'none';
   document.getElementById('upcoming-section').style.display = 'none';
   document.getElementById('history-section').style.display = 'none';
+    document.querySelector('.floating-btn').style.display = 'none';
   currentSection = "add-appointment"; // تحديث المتغير ليعكس الصفحة الحالية
 }
 
@@ -715,9 +748,18 @@ function savePostponedAppointment() {
 
   const appointment = appointments.find(app => app.id === currentAppointmentId);
   if (appointment) {
+    // تحديث تاريخ ووقت الموعد
     appointment.date = newAppointmentDate;
     appointment.time = newAppointmentTime;
-    loadAppointments(); // إعادة تحميل المواعيد لتحديث الجدول
+
+    // تحديث حالة الموعد إذا لزم الأمر
+    appointment.status = "قيد الانتظار"; // أو أي حالة أخرى تناسب منطق التطبيق
+
+    // حفظ التغييرات في localStorage
+    localStorage.setItem('appointments', JSON.stringify(appointments));
+
+    // إعادة تحميل المواعيد لتحديث الجدول
+    loadAppointments();
   }
 
   closeModal('postponeModal');
@@ -785,3 +827,18 @@ document.getElementById('phone').addEventListener('input', function() {
     document.getElementById('notes').value = '';
   }
 });
+
+//لاخفاء حقل الوقت والتاريخ
+function toggleDateTimeFields() {
+  const noDateCheckbox = document.getElementById('no-date-checkbox');
+  const timeField = document.getElementById('appointment-time');
+  const dateField = document.getElementById('appointment-date');
+
+  if (noDateCheckbox.checked) {
+    timeField.disabled = true;
+    dateField.disabled = true;
+  } else {
+    timeField.disabled = false;
+    dateField.disabled = false;
+  }
+}

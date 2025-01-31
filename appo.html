@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar">
 <head>
@@ -5,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>إدارة المواعيد</title>
   <link rel="stylesheet" href="appo.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <!-- العنوان -->
@@ -33,6 +33,9 @@
       <label for="alt-phone">رقم هاتف آخر:</label>
       <input type="text" id="alt-phone">
       
+	  <label for="no-date-checkbox">بدون تاريخ:</label>
+    <input type="checkbox" id="no-date-checkbox" onchange="toggleDateTimeFields()">
+	
       <label for="appointment-time">وقت الموعد:</label>
       <input type="time" id="appointment-time" required>
       

@@ -469,3 +469,14 @@ h2 {
 .modal button:hover {
   background-color: #0056b3;
 }
+
+input:disabled, textarea:disabled {
+  background-color: #f0f0f0;
+  color: #a0a0a0;
+}
+
+/* تنسيق حقول التاريخ والوقت عند تعطيلها */
+input:disabled {
+  background-color: #f0f0f0;
+  color: #a0a0a0;
+}

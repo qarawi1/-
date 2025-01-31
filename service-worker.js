@@ -1,10 +1,11 @@
-const CACHE_NAME = 'app-cache-v4';
-const OFFLINE_URL = '/offline.html'; // الصفحة التي تريد عرضها عند عدم وجود اتصال
+const CACHE_NAME = 'app-cache-v7';
+const OFFLINE_URL = '/offline.html';
 
 const OFFLINE_URLS = [
     '/index.html',
-    '/appo.html',	
+    '/appo.html',
     '/offline.html',
+    '/dashboard.html',
     '/css/styles.css',
     '/js/scripts.js',
     '/js/appo.js',
@@ -14,7 +15,6 @@ const OFFLINE_URLS = [
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            // إضافة الملفات إلى الكاش
             return cache.addAll(OFFLINE_URLS).catch((error) => {
                 console.error('Failed to cache some resources:', error);
             });
@@ -23,21 +23,17 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    // تجاهل الطلبات غير المدعومة (مثل POST)
     if (event.request.method !== 'GET') {
         return;
     }
 
     event.respondWith(
         caches.match(event.request).then((response) => {
-            // إذا كان الطلب موجودًا في الكاش، قم بإرجاعه
             if (response) {
                 return response;
             }
 
-            // إذا لم يكن الطلب موجودًا في الكاش، حاول جلبها من الشبكة
             return fetch(event.request).then((networkResponse) => {
-                // إذا نجح الجلب من الشبكة، قم بتخزينها في الكاش
                 if (networkResponse.ok) {
                     const responseToCache = networkResponse.clone();
                     caches.open(CACHE_NAME).then((cache) => {
@@ -46,7 +42,6 @@ self.addEventListener('fetch', (event) => {
                 }
                 return networkResponse;
             }).catch(() => {
-                // إذا فشل الجلب من الشبكة، قم بإرجاع الصفحة المخزنة في الكاش
                 return caches.match(OFFLINE_URL);
             });
         })
