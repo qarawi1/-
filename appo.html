@@ -15,9 +15,13 @@
   
   <!-- حاوية الأزرار العلوية -->
   <div class="button-container">
+  <button onclick="syncAppointmentsToFirebase()">مزامنة البيانات</button>
     <button class="upcoming-btn" onclick="showUpcomingAppointments()">المواعيد القادمة</button>
     <button class="history-btn" onclick="showHistory()">سجل المواعيد</button>
   </div>
+  
+  <div id="loadingSpinner" style="display: none;">جاري التحميل...</div>
+
 
   <!-- واجهة إضافة موعد جديد -->
   <section id="add-appointment-section" class="add-appointment-section" style="display: none;">
@@ -319,6 +323,6 @@
   </div>
 </div>
 
-  <script src="appo.js"></script>
+  <script src="appo.js" type="module"></script>
 </body>
 </html>
