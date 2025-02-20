@@ -93,12 +93,12 @@ let currentUser = {
   id: null
 };
 
-// مراقبة حالة تسجيل الدخول
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     console.log("✅ المستخدم مسجّل دخول:", user.uid);
 
-    // جلب بيانات المستخدم من Firestore وحفظها في التخزين المحلي
+    // جلب بيانات المستخدم من Firestore
     const userRef = doc(firestore, "users", user.uid);
     try {
       const userSnap = await getDoc(userRef);
@@ -110,13 +110,16 @@ onAuthStateChanged(auth, async (user) => {
       } else {
         currentUser = { id: user.uid, name: user.displayName || "مستخدم مجهول" };
       }
+
+      // 🔥 حفظ بيانات المستخدم في localStorage عند تسجيل الدخول
       localStorage.setItem("currentUser", JSON.stringify(currentUser));
       console.log("✅ تم حفظ بيانات المستخدم في localStorage:", currentUser);
+
     } catch (error) {
       console.error("❌ خطأ في جلب بيانات المستخدم:", error);
     }
 
-    // استعلام لجلب مواعيد المستخدم فقط
+    // ✅ تحميل المواعيد من Firestore أو التخزين المحلي عند فقدان الاتصال
     const userAppointmentsQuery = query(collection(firestore, "appointments"), where("userId", "==", user.uid));
 
     if (navigator.onLine) {
@@ -126,6 +129,8 @@ onAuthStateChanged(auth, async (user) => {
           firebaseId: doc.id,
           ...doc.data()
         }));
+
+        // حفظ المواعيد في التخزين المحلي
         localStorage.setItem(`appointments_${user.uid}`, JSON.stringify(fetchedAppointments));
         console.log("📄 تم تحديث المواعيد في localStorage:", fetchedAppointments);
         displayAppointments(fetchedAppointments);
@@ -137,7 +142,13 @@ onAuthStateChanged(auth, async (user) => {
       const cachedAppointments = JSON.parse(localStorage.getItem(`appointments_${user.uid}`)) || [];
       displayAppointments(cachedAppointments);
     }
+
   } else {
+    console.log("❌ لا يوجد مستخدم مسجّل دخول");
+
+    // ✅ عرض رسالة انتهاء الجلسة
+    showSessionExpiredModal();
+
     if (!navigator.onLine) {
       const storedUser = JSON.parse(localStorage.getItem("currentUser"));
       if (storedUser && storedUser.id) {
@@ -148,10 +159,12 @@ onAuthStateChanged(auth, async (user) => {
         return;
       }
     }
-    console.log("❌ لا يوجد مستخدم مسجّل دخول");
+
+    // ✅ مسح بيانات الجلسة فقط عند وجود إنترنت لضمان عدم فقدانها أثناء انقطاع الإنترنت
     if (navigator.onLine) {
       localStorage.removeItem("currentUser");
     }
+    
     displayAppointments([]);
   }
 });
@@ -373,6 +386,7 @@ window.cancelAddAppointment = function() {
   document.querySelector('.button-container').style.display = 'flex'; // إعادة عرض حاوية الأزرار
     document.querySelector('.floating-btn').style.display = 'block';
 }
+
 window.saveAppointment = async function() {
     // ✅ استعادة بيانات المستخدم في حالة عدم وجودها
     if (!currentUser.id) {
@@ -415,7 +429,8 @@ window.saveAppointment = async function() {
         notes,
         status: noDateCheckbox ? "بانتظار تحديد موعد" : "قيد الانتظار",
         addedBy: currentUser.name || "غير متوفر",
-        userId: currentUser.id
+        userId: currentUser.id,
+        synced: navigator.onLine // ✅ يحدد ما إذا كان الموعد قد تمت مزامنته مع Firebase
     };
 
     if (!clientName || !phone || !issue) {
@@ -432,17 +447,6 @@ window.saveAppointment = async function() {
         }
     }
 
-    try {
-        if (navigator.onLine) {
-            const docRef = await addDoc(collection(firestore, "appointments"), newAppointment);
-            newAppointment.firebaseId = docRef.id;
-        } else {
-            console.log("🚀 الموعد تم تخزينه محليًا وسيتم رفعه لاحقًا.");
-        }
-    } catch (error) {
-        console.error("خطأ أثناء حفظ الموعد في Firebase:", error);
-    }
-
     let localAppointments = JSON.parse(localStorage.getItem(`appointments_${currentUser.id}`)) || [];
 
     // ✅ التأكد من أن الموعد غير مكرر في التخزين المحلي
@@ -451,10 +455,30 @@ window.saveAppointment = async function() {
         localStorage.setItem(`appointments_${currentUser.id}`, JSON.stringify(localAppointments));
     }
 
+    try {
+        if (navigator.onLine) {
+            // ✅ حفظ الموعد في Firebase إذا كان هناك إنترنت
+            const docRef = await addDoc(collection(firestore, "appointments"), newAppointment);
+            newAppointment.firebaseId = docRef.id;
+            newAppointment.synced = true; // ✅ تحديث حالة المزامنة
+
+            // ✅ تحديث التخزين المحلي بعد الحفظ في Firebase
+            localAppointments = localAppointments.map(app =>
+                app.id === newAppointment.id ? newAppointment : app
+            );
+            localStorage.setItem(`appointments_${currentUser.id}`, JSON.stringify(localAppointments));
+        } else {
+            console.log("🚀 الإنترنت غير متوفر، الموعد تم تخزينه محليًا فقط وسيتم رفعه لاحقًا.");
+        }
+    } catch (error) {
+        console.error("❌ خطأ أثناء حفظ الموعد في Firebase:", error);
+    }
+
     console.log("✅ تم حفظ الموعد بنجاح:", newAppointment);
     loadAppointments();
     cancelAddAppointment();
 };
+
 
 
 
@@ -1091,44 +1115,32 @@ window.loadAppointments = async function() {
 
 // إرسال المواعيد إلى Firebase عند الاتصال بالإنترنت
 window.syncAppointmentsToFirebase = async function() {
-  if (!currentUser.id) {
-    console.error("❌ لا يوجد معرف مستخدم، لا يمكن مزامنة المواعيد!");
-    return;
-  }
+    if (!currentUser.id) {
+        console.error("❌ لا يوجد معرف مستخدم، لا يمكن مزامنة المواعيد!");
+        return;
+    }
 
-  const localAppointments = JSON.parse(localStorage.getItem(`appointments_${currentUser.id}`)) || [];
+    let localAppointments = JSON.parse(localStorage.getItem(`appointments_${currentUser.id}`)) || [];
+    let unsyncedAppointments = localAppointments.filter(app => !app.synced); // ✅ استخراج المواعيد غير المتزامنة فقط
 
-  if (localAppointments.length === 0) {
-    console.log("✅ لا توجد مواعيد غير متزامنة.");
-    return;
-  }
+    if (unsyncedAppointments.length === 0) {
+        console.log("✅ لا توجد مواعيد غير متزامنة.");
+        return;
+    }
 
-  try {
-    const batch = writeBatch(firestore);
-    const appointmentsRef = collection(firestore, "appointments");
+    try {
+        for (let app of unsyncedAppointments) {
+            const docRef = await addDoc(collection(firestore, "appointments"), app);
+            app.firebaseId = docRef.id;
+            app.synced = true; // ✅ تعيين حالة المزامنة بعد الحفظ في Firebase
+        }
 
-    // جلب المواعيد الحالية من Firestore
-    const serverSnapshot = await getDocs(query(appointmentsRef, where("userId", "==", currentUser.id)));
-    const serverAppointments = serverSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    // مقارنة البيانات لمنع التكرار
-    localAppointments.forEach(localApp => {
-      const isDuplicate = serverAppointments.some(serverApp => serverApp.id === localApp.id);
-
-      if (!isDuplicate && !localApp.firebaseId) {
-        const docRef = doc(appointmentsRef);
-        batch.set(docRef, { ...localApp, userId: currentUser.id });
-        localApp.firebaseId = docRef.id;
-      }
-    });
-
-    await batch.commit();
-
-    localStorage.setItem(`appointments_${currentUser.id}`, JSON.stringify(localAppointments));
-    console.log("✅ تم مزامنة المواعيد مع Firebase بنجاح!");
-  } catch (error) {
-    console.error("❌ حدث خطأ أثناء المزامنة:", error);
-  }
+        // ✅ تحديث التخزين المحلي بعد مزامنة جميع المواعيد
+        localStorage.setItem(`appointments_${currentUser.id}`, JSON.stringify(localAppointments));
+        console.log("✅ تم مزامنة جميع المواعيد غير المتزامنة مع Firebase بنجاح!");
+    } catch (error) {
+        console.error("❌ خطأ أثناء مزامنة المواعيد مع Firebase:", error);
+    }
 };
 
 
@@ -1137,18 +1149,29 @@ async function reloadAppointments() {
   await fetchAppointmentsFromServer(); // جلب البيانات مجددًا
   displayAppointments(appointments);   // إعادة عرض البيانات
 }
-
 // ✅ عند تحميل الصفحة، استعادة الجلسة إذا لم يكن هناك إنترنت
 window.addEventListener("load", async () => {
   console.log("✅ تم تحميل الصفحة، في انتظار تسجيل الدخول...");
 
-  if (!navigator.onLine) {
+  if (!navigator.onLine) { // إذا لم يكن هناك اتصال بالإنترنت
     console.warn("⚠️ لا يوجد اتصال بالإنترنت، يتم استعادة الجلسة...");
-    restoreSession();
+    let storedUser = JSON.parse(localStorage.getItem("currentUser"));
+
+    if (storedUser && storedUser.id) {
+      currentUser = storedUser;
+      console.log("✅ تم استعادة بيانات المستخدم من التخزين المحلي:", currentUser);
+
+      // ✅ تحميل المواعيد من التخزين المحلي
+      let cachedAppointments = JSON.parse(localStorage.getItem(`appointments_${currentUser.id}`)) || [];
+      displayAppointments(cachedAppointments);
+    } else {
+      console.warn("⚠️ لا يوجد مستخدم مسجّل دخول محليًا.");
+      showSessionExpiredModal(); // عرض رسالة انتهاء الجلسة
+    }
     return;
   }
 
-  // ✅ استعادة بيانات المستخدم من التخزين المحلي
+  // ✅ استعادة بيانات المستخدم من التخزين المحلي في حال توفر الإنترنت
   let storedUser = JSON.parse(localStorage.getItem("currentUser"));
   if (storedUser && storedUser.id) {
     currentUser = storedUser;
@@ -1156,9 +1179,10 @@ window.addEventListener("load", async () => {
   } else {
     console.warn("⚠️ لم يتم العثور على بيانات المستخدم محليًا.");
     currentUser = { id: null, name: "مستخدم مجهول" };
+    showSessionExpiredModal(); // عرض رسالة انتهاء الجلسة
   }
 
-  // ✅ استعادة المواعيد من التخزين المحلي
+  // ✅ تحميل المواعيد من التخزين المحلي
   let cachedAppointments = JSON.parse(localStorage.getItem(`appointments_${currentUser.id}`)) || [];
   if (cachedAppointments.length > 0) {
     console.log("📌 عرض المواعيد من التخزين المحلي:", cachedAppointments);
@@ -1167,7 +1191,7 @@ window.addEventListener("load", async () => {
     console.warn("⚠️ لا توجد مواعيد في التخزين المحلي!");
   }
 
-  // ✅ متابعة تسجيل الدخول قبل تحميل المواعيد من Firestore
+  // ✅ انتظار تسجيل الدخول قبل تحميل المواعيد من Firestore
   const waitForUserLogin = new Promise((resolve) => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -1177,6 +1201,7 @@ window.addEventListener("load", async () => {
         resolve(user);
       } else {
         console.warn("⚠️ لا يوجد مستخدم مسجّل دخول، سيتم استخدام التخزين المحلي فقط.");
+        showSessionExpiredModal(); // عرض رسالة انتهاء الجلسة
         resolve(null);
       }
     });
@@ -1193,20 +1218,29 @@ window.addEventListener("load", async () => {
   }
 });
 
-// ✅ الاستماع لتغيرات الاتصال بالإنترنت وإعادة فحص المصادقة عند عودة الاتصال
+
+// الاستماع لتغيرات الاتصال بالإنترنت وإعادة فحص المصادقة عند عودة الاتصال
 window.addEventListener("online", async () => {
-  console.log("🌍 تمت استعادة الاتصال بالإنترنت، جاري مزامنة المواعيد...");
-  
-  // ✅ التحقق مما إذا كان هناك مستخدم حالي أم لا
-  const storedUser = JSON.parse(localStorage.getItem("currentUser"));
-  if (storedUser && storedUser.id) {
+  console.log("🌍 تمت استعادة الاتصال بالإنترنت، جاري المزامنة...");
+
+  if (currentUser && currentUser.id) {
     console.log("✅ المستخدم لا يزال مسجّل دخول، إعادة تحميل المواعيد...");
     await syncAppointmentsToFirebase();
     await loadAppointments();
   } else {
-    console.warn("⚠️ لا يوجد مستخدم مخزن محليًا، انتظار Firebase لإعادة التحقق من الجلسة.");
-    
-    // ✅ انتظار إعادة فحص المصادقة بعد استعادة الاتصال
+    console.warn("⚠️ لا يوجد مستخدم مخزن محليًا، انتظار Firebase للتحقق...");
+
+    // ✅ استعادة بيانات المستخدم من التخزين المحلي أولًا
+    let storedUser = JSON.parse(localStorage.getItem("currentUser"));
+    if (storedUser && storedUser.id) {
+      currentUser = storedUser;
+      console.log("✅ تم استعادة المستخدم من التخزين المحلي بعد عودة الإنترنت:", currentUser);
+      await syncAppointmentsToFirebase();
+      await loadAppointments();
+      return;
+    }
+
+    // ✅ في حال عدم وجود مستخدم محليًا، نتحقق من Firebase
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         console.log("✅ تم استعادة تسجيل الدخول تلقائيًا:", user.uid);
@@ -1216,16 +1250,30 @@ window.addEventListener("online", async () => {
         await loadAppointments();
       } else {
         console.warn("❌ لم يتم استعادة الجلسة تلقائيًا، يتطلب تسجيل الدخول يدويًا.");
+        showSessionExpiredModal();
       }
     });
   }
 });
 
-// ✅ عند فقدان الاتصال، استخدام البيانات المحلية دون مسح الجلسة
-window.addEventListener("offline", () => {
-  console.warn("⚠️ تم فقدان الاتصال بالإنترنت، سيتم عرض البيانات من التخزين المحلي فقط.");
-});
 
+// عند فقدان الاتصال، استخدام البيانات المحلية دون مسح الجلسة
+window.addEventListener("offline", () => {
+  console.warn("⚠️ تم فقدان الاتصال بالإنترنت، سيتم استخدام البيانات المخزنة محليًا.");
+  
+  if (!currentUser.id) {
+    let storedUser = JSON.parse(localStorage.getItem("currentUser"));
+    if (storedUser && storedUser.id) {
+      currentUser = storedUser;
+      console.log("✅ تم استعادة المستخدم بعد فقدان الإنترنت:", currentUser);
+      
+      let cachedAppointments = JSON.parse(localStorage.getItem(`appointments_${currentUser.id}`)) || [];
+      displayAppointments(cachedAppointments);
+    } else {
+      console.warn("⚠️ لم يتم العثور على مستخدم مسجّل دخول محليًا.");
+    }
+  }
+});
 
 
 
@@ -1266,4 +1314,26 @@ function updateHistoryTable(filteredAppointments) {
   }
 
   console.log("✅ تم تحديث جدول سجل المواعيد بالنتائج المفلترة.");
+}
+
+// فتح الـ Modal عند انتهاء الجلسة
+function showSessionExpiredModal() {
+  const modal = document.getElementById("sessionExpiredModal");
+  modal.style.display = "block";
+}
+
+// إغلاق الـ Modal عند الضغط على زر تسجيل الدخول
+document.getElementById("loginButton").addEventListener("click", () => {
+  const modal = document.getElementById("sessionExpiredModal");
+  modal.style.display = "none";
+  // توجيه المستخدم إلى صفحة تسجيل الدخول
+  window.location.href = "/auth.html"; // قم بتغيير المسار إلى صفحة تسجيل الدخول الخاصة بك
+});
+
+// دالة للتحقق من انتهاء الجلسة
+function checkSessionExpiry() {
+  const user = JSON.parse(localStorage.getItem("currentUser"));
+  if (!user || !user.id) {
+    showSessionExpiredModal();
+  }
 }

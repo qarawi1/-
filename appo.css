@@ -472,3 +472,16 @@ input:disabled {
   background-color: #f0f0f0;
   color: #a0a0a0;
 }
+
+#loginButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#loginButton:hover {
+  background-color: #0056b3;
+}
